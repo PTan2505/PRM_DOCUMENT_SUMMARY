@@ -13,12 +13,52 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Image Labels Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Extracted Text"
+            android:text="Phân loại nội dung"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#E3F2FD"
+            app:cardUseCompatPadding="true">
+
+            <TextView
+                android:id="@+id/labelsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textSize="14sp"
+                android:textColor="#1976D2"
+                android:text="Đang phân tích..."
+                android:textStyle="italic" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Extracted Text Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Văn bản trích xuất"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"/>
 
         <androidx.cardview.widget.CardView
@@ -33,14 +73,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                android:text="Đang xử lý..." />
 
         </androidx.cardview.widget.CardView>
 
+        <!-- AI Summary Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AI Summary &amp; Quiz"
+            android:text="Tóm tắt &amp; Câu hỏi"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="24dp"
@@ -51,6 +94,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFF3E0"
             app:cardUseCompatPadding="true">
 
             <TextView
@@ -58,7 +102,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                android:text="Đang tạo tóm tắt..." />
 
         </androidx.cardview.widget.CardView>
 
