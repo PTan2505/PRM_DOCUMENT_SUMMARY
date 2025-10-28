@@ -7,7 +7,7 @@ import retrofit2.http.Query;
 
 public interface GeminiApiService {
     // ✅ Sử dụng gemini-2.5-flash (model mới nhất, tháng 10/2024)
-    @POST("v1beta/models/gemini-2.5-flash:generateContent")
+    @POST("v1beta/models/gemini-2.5-pro:generateContent")
     Call<GeminiApiResponse> generateContent(
             @Query("key") String apiKey,
             @Body GeminiApiRequest request
