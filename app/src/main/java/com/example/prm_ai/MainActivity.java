@@ -58,6 +58,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+    // ✅ ActivityResultLauncher cho chọn ảnh từ thư viện
+    private final ActivityResultLauncher<String> pickImageLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    scannedImageUri = uri;
+
+                    // Hiển thị ảnh
+                    imageView.setImageURI(scannedImageUri);
+                    extractButton.setVisibility(View.VISIBLE);
+
+                    Toast.makeText(this, "Đã chọn ảnh từ thư viện", Toast.LENGTH_SHORT).show();
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,9 +93,15 @@ public class MainActivity extends AppCompatActivity {
 
         scanner = GmsDocumentScanning.getClient(options);
 
+        // Nút quét tài liệu
         Button captureButton = findViewById(R.id.captureButton);
         captureButton.setOnClickListener(v -> checkPermissionAndScan());
 
+        // ✅ Nút chọn ảnh từ thư viện
+        Button galleryButton = findViewById(R.id.galleryButton);
+        galleryButton.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
+
+        // Nút phân tích
         extractButton.setOnClickListener(v -> {
             if (scannedImageUri != null) {
                 Intent intent = new Intent(MainActivity.this, ResultActivity.class);
