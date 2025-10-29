@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -41,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Get user ID from LoginActivity
         userId = getIntent().getIntExtra("USER_ID", -1);
 
         imageView = findViewById(R.id.imageView);
@@ -60,10 +61,27 @@ public class MainActivity extends AppCompatActivity {
             if (currentPhotoPath != null) {
                 Intent intent = new Intent(MainActivity.this, ResultActivity.class);
                 intent.putExtra("PHOTO_PATH", currentPhotoPath);
-                intent.putExtra("USER_ID", userId); // Pass the user ID to ResultActivity
+                intent.putExtra("USER_ID", userId);
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_history) {
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("USER_ID", userId);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void dispatchTakePictureIntent() {

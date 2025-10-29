@@ -30,7 +30,8 @@ public class ResultActivity extends AppCompatActivity {
     private TextRecognizer recognizer;
     private GeminiApiService apiService;
     private DatabaseHelper dbHelper;
-    private int userId = -1; // Default to -1 (for Google users or errors)
+    private int userId = -1;
+    private String currentPhotoPath; // ✅ Biến để lưu đường dẫn ảnh
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class ResultActivity extends AppCompatActivity {
         apiService = ApiClient.getClient().create(GeminiApiService.class);
 
         // Get data from Intent
-        String currentPhotoPath = getIntent().getStringExtra("PHOTO_PATH");
+        currentPhotoPath = getIntent().getStringExtra("PHOTO_PATH"); // ✅ Lấy và lưu đường dẫn
         userId = getIntent().getIntExtra("USER_ID", -1);
 
         if (currentPhotoPath != null) {
@@ -78,7 +79,6 @@ public class ResultActivity extends AppCompatActivity {
         String prompt = "Summarize the following text and generate 3 quiz questions with answers based on it:\n\n" + text;
         GeminiApiRequest request = new GeminiApiRequest(prompt);
 
-        // Use the API Key from BuildConfig
         apiService.generateContent(BuildConfig.GEMINI_API_KEY, request).enqueue(new Callback<GeminiApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
@@ -86,24 +86,18 @@ public class ResultActivity extends AppCompatActivity {
                     String summary = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
                     summaryTextView.setText(summary);
 
-                    // Save to history if we have a valid local user ID
-                    if (userId != -1) {
-                        dbHelper.addScanHistory(userId, text, summary);
+                    // ✅ Lưu lịch sử với đường dẫn ảnh
+                    if (userId != -1 && currentPhotoPath != null) {
+                        dbHelper.addScanHistory(userId, currentPhotoPath, text, summary);
                     }
                 } else {
                     summaryTextView.setText("Summarization failed. Please check your API key and network connection.");
-                    try {
-                        if (response.errorBody() != null) {
-                            Toast.makeText(ResultActivity.this, "Error: " + response.errorBody().string(), Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) { e.printStackTrace(); }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
                 summaryTextView.setText("Summarization failed. Please check your network connection.");
-                 Toast.makeText(ResultActivity.this, "Failure: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

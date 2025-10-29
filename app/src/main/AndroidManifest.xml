@@ -17,7 +17,6 @@
         android:theme="@style/Theme.PRM_AI"
         tools:targetApi="31">
 
-        <!-- ✅ LoginActivity is now the starting point -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
@@ -28,23 +27,27 @@
             </intent-filter>
         </activity>
 
-        <!-- ✅ RegisterActivity -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
             android:parentActivityName=".LoginActivity"/>
 
-        <!-- MainActivity (no longer the launcher) -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
 
-        <!-- ResultActivity -->
         <activity
             android:name=".ResultActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity">
         </activity>
+
+        <!-- ✅ HistoryActivity -->
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="false"
+            android:label="Scan History"
+            android:parentActivityName=".MainActivity" />
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
