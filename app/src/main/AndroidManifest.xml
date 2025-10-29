@@ -5,6 +5,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -42,12 +43,23 @@
             android:parentActivityName=".MainActivity">
         </activity>
 
-        <!-- ✅ HistoryActivity -->
         <activity
             android:name=".HistoryActivity"
             android:exported="false"
             android:label="Scan History"
             android:parentActivityName=".MainActivity" />
+            
+        <activity
+            android:name=".QuizActivity"
+            android:exported="false"
+            android:label="Quiz"
+            android:parentActivityName=".ResultActivity" />
+
+        <!-- ✅ HistoryDetailActivity -->
+        <activity
+            android:name=".HistoryDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".HistoryActivity" />
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"

@@ -34,7 +34,12 @@ public class HistoryActivity extends AppCompatActivity {
         recyclerViewHistory.setLayoutManager(new LinearLayoutManager(this));
         historyAdapter = new HistoryAdapter(this, historyList);
         recyclerViewHistory.setAdapter(historyAdapter);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the list every time the activity is shown
         loadHistory();
     }
 
@@ -45,7 +50,9 @@ public class HistoryActivity extends AppCompatActivity {
             return;
         }
 
+        historyList.clear(); // Clear old data before loading new
         Cursor cursor = dbHelper.getScanHistory(userId);
+
         if (cursor != null && cursor.moveToFirst()) {
             textViewNoHistory.setVisibility(View.GONE);
             recyclerViewHistory.setVisibility(View.VISIBLE);
@@ -56,8 +63,15 @@ public class HistoryActivity extends AppCompatActivity {
                 String originalText = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ORIGINAL_TEXT));
                 String summaryText = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SUMMARY_TEXT));
                 String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIMESTAMP));
+                String quizJson = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_JSON));
+                
+                // Use Integer to handle possible null scores
+                Integer quizScore = null;
+                if (!cursor.isNull(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_SCORE))) {
+                    quizScore = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_SCORE));
+                }
 
-                historyList.add(new ScanHistoryItem(id, imagePath, originalText, summaryText, timestamp));
+                historyList.add(new ScanHistoryItem(id, imagePath, summaryText, originalText, timestamp, quizJson, quizScore));
             } while (cursor.moveToNext());
 
             cursor.close();

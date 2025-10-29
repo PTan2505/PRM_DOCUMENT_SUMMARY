@@ -1,6 +1,7 @@
 package com.example.prm_ai;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.util.List;
@@ -39,29 +41,58 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         holder.summaryPreview.setText(item.getSummaryText());
         holder.timestamp.setText(item.getTimestamp());
 
-        // Use Glide to load the image from the file path
+        // Hiển thị điểm số
+        if (item.getQuizScore() != null) {
+            // Cần lấy tổng số câu hỏi từ JSON để hiển thị chính xác
+            int totalQuestions = getTotalQuestionsFromJson(item.getQuizJson());
+            holder.score.setText("Score: " + item.getQuizScore() + "/" + totalQuestions);
+            holder.score.setVisibility(View.VISIBLE);
+        } else {
+            holder.score.setText("Score: Not taken");
+            holder.score.setVisibility(View.VISIBLE);
+        }
+
         Glide.with(context)
                 .load(new File(item.getImagePath()))
-                .placeholder(R.mipmap.ic_launcher) // Optional placeholder
-                .error(R.drawable.ic_launcher_background) // Optional error image
+                .placeholder(R.mipmap.ic_launcher)
                 .into(holder.thumbnail);
+
+        // Xử lý sự kiện nhấn vào item
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, HistoryDetailActivity.class);
+            intent.putExtra("HISTORY_ID", item.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override
     public int getItemCount() {
         return historyList.size();
     }
+    
+    private int getTotalQuestionsFromJson(String json) {
+        if (json == null || json.isEmpty()) return 0;
+        try {
+            QuizResponse response = new Gson().fromJson(json, QuizResponse.class);
+            return response.getQuestions().size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
 
     public static class HistoryViewHolder extends RecyclerView.ViewHolder {
         ImageView thumbnail;
         TextView summaryPreview;
         TextView timestamp;
+        TextView score; // ✅
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
             thumbnail = itemView.findViewById(R.id.imageViewThumbnail);
             summaryPreview = itemView.findViewById(R.id.textViewSummaryPreview);
             timestamp = itemView.findViewById(R.id.textViewTimestamp);
+            score = itemView.findViewById(R.id.textViewItemScore); // ✅
         }
     }
 }
