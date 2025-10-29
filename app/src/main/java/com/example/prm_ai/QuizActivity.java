@@ -23,8 +23,10 @@ import com.example.prm_ai.network.GeminiApiResponse;
 import com.example.prm_ai.network.GeminiApiService;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,77 +81,19 @@ public class QuizActivity extends AppCompatActivity {
 
         buttonSubmitQuiz.setOnClickListener(v -> handleSubmit());
         buttonFinishQuiz.setOnClickListener(v -> finish());
-        
+
         buttonStatistics.setOnClickListener(v -> {
-            Intent intent = new Intent(QuizActivity.this, StatisticsActivity.class);
-            intent.putExtra("QUESTIONS", (Serializable) questions);
-            intent.putStringArrayListExtra("USER_ANSWERS", userAnswers);
-            startActivity(intent);
+            if (questions != null && !questions.isEmpty()) {
+                Intent intent = new Intent(QuizActivity.this, StatisticsActivity.class);
+                intent.putExtra("QUESTIONS", (Serializable) questions);
+                intent.putStringArrayListExtra("USER_ANSWERS", userAnswers);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "No quiz data available for statistics.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    private void handleSubmit() {
-        if (!isAnswerSubmitted) {
-            int selectedId = radioGroupOptions.getCheckedRadioButtonId();
-            if (selectedId == -1) {
-                Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
-                radioGroupOptions.getChildAt(i).setEnabled(false);
-            }
-
-            RadioButton selectedRadioButton = findViewById(selectedId);
-            String selectedAnswer = selectedRadioButton.getText().toString();
-            userAnswers.add(selectedAnswer); 
-            String correctAnswer = questions.get(currentQuestionIndex).getAnswer();
-
-            if (selectedAnswer.equals(correctAnswer)) {
-                score++;
-                selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
-            } else {
-                selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
-                for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
-                    RadioButton button = (RadioButton) radioGroupOptions.getChildAt(i);
-                    if (button.getText().toString().equals(correctAnswer)) {
-                        button.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
-                        break;
-                    }
-                }
-            }
-
-            isAnswerSubmitted = true;
-            if (currentQuestionIndex < questions.size() - 1) {
-                buttonSubmitQuiz.setText("Tiếp");
-            } else {
-                buttonSubmitQuiz.setText("Hoàn thành");
-            }
-
-        } else {
-            if(userAnswers.size() <= currentQuestionIndex){
-                 userAnswers.add("");
-            }
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.size()) {
-                displayQuestion();
-            } else {
-                showFinalScore();
-            }
-        }
-    }
-
-    private void showFinalScore() {
-        quizContainer.setVisibility(View.GONE);
-        scoreContainer.setVisibility(View.VISIBLE);
-        textViewScore.setText(score + "/" + questions.size());
-
-        // Convert user answers to JSON and save to the database
-        String userAnswersJson = new Gson().toJson(userAnswers);
-        dbHelper.updateQuizAttempt(historyId, score, userAnswersJson);
-    }
-    
-    // Other methods remain the same...
     private void loadQuiz() {
         progressBarQuiz.setVisibility(View.VISIBLE);
         quizContainer.setVisibility(View.GONE);
@@ -158,20 +102,27 @@ public class QuizActivity extends AppCompatActivity {
         if (cursor != null && cursor.moveToFirst()) {
             String quizJson = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_JSON));
             String originalText = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ORIGINAL_TEXT));
+            // ✅ Lấy mã ngôn ngữ đã lưu
+            String languageCode = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LANGUAGE_CODE));
             cursor.close();
 
             if (quizJson != null && !quizJson.trim().isEmpty()) {
                 parseQuizJson(quizJson);
             } else {
-                generateQuiz(originalText);
+                // ✅ Tạo quiz theo ngôn ngữ đã phát hiện
+                generateQuiz(originalText, languageCode);
             }
         } else {
             showError("Could not find history item to start quiz.");
         }
     }
 
-    private void generateQuiz(String text) {
-        String prompt = "Based on the following text, generate exactly 10 multiple-choice questions. " +
+    // ✅ generateQuiz giờ sẽ dựa trên ngôn ngữ được truyền vào
+    private void generateQuiz(String text, String languageCode) {
+        String languageName = getLanguageName(languageCode);
+        
+        String prompt = "Based on the following text, generate exactly 10 multiple-choice questions in " + languageName + ". " +
+                "The entire JSON output, including keys and values, MUST be in " + languageName + ". " +
                 "Provide the output in a clean JSON format. The JSON should be an object with a single key 'questions'. " +
                 "This key should hold an array of question objects. Each object must have three keys: 'question' (the question text), " +
                 "'options' (an array of 4 string choices), and 'answer' (the correct choice text). " +
@@ -200,11 +151,22 @@ public class QuizActivity extends AppCompatActivity {
         });
     }
 
+    private String getLanguageName(String languageCode) {
+        switch (languageCode) {
+            case "vi": return "Vietnamese";
+            case "en": return "English";
+            // Thêm các ngôn ngữ khác nếu cần
+            default: return "English";
+        }
+    }
+
     private void parseQuizJson(String json) {
         try {
             Gson gson = new Gson();
             QuizResponse quizResponse = gson.fromJson(json, QuizResponse.class);
-            questions = quizResponse.getQuestions();
+            if (quizResponse != null) {
+                questions = quizResponse.getQuestions();
+            }
 
             if (questions != null && !questions.isEmpty()) {
                 progressBarQuiz.setVisibility(View.GONE);
@@ -236,10 +198,72 @@ public class QuizActivity extends AppCompatActivity {
         }
         radioGroupOptions.clearCheck();
     }
-    
+
+    private void handleSubmit() {
+        if (!isAnswerSubmitted) {
+            int selectedId = radioGroupOptions.getCheckedRadioButtonId();
+            if (selectedId == -1) {
+                Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
+                radioGroupOptions.getChildAt(i).setEnabled(false);
+            }
+
+            RadioButton selectedRadioButton = findViewById(selectedId);
+            String selectedAnswer = selectedRadioButton.getText().toString();
+            userAnswers.add(selectedAnswer);
+            String correctAnswer = questions.get(currentQuestionIndex).getAnswer();
+
+            if (selectedAnswer.equals(correctAnswer)) {
+                score++;
+                selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+            } else {
+                selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
+                for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
+                    RadioButton button = (RadioButton) radioGroupOptions.getChildAt(i);
+                    if (button.getText().toString().equals(correctAnswer)) {
+                        button.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+                        break;
+                    }
+                }
+            }
+
+            isAnswerSubmitted = true;
+            if (currentQuestionIndex < questions.size() - 1) {
+                buttonSubmitQuiz.setText("Next");
+            } else {
+                buttonSubmitQuiz.setText("Finish");
+            }
+
+        } else {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.size()) {
+                displayQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+    }
+
+    private void showFinalScore() {
+        quizContainer.setVisibility(View.GONE);
+        scoreContainer.setVisibility(View.VISIBLE);
+        textViewScore.setText(score + "/" + questions.size());
+
+        String userAnswersJson = new Gson().toJson(userAnswers);
+        dbHelper.updateQuizAttempt(historyId, score, userAnswersJson);
+    }
+
     private void showError(String message) {
         progressBarQuiz.setVisibility(View.GONE);
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         finish();
+    }
+
+    static class QuizResponse {
+        private List<QuizQuestion> questions;
+        public List<QuizQuestion> getQuestions() { return questions; }
     }
 }

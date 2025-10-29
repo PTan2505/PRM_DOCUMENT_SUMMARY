@@ -17,6 +17,8 @@ import com.example.prm_ai.network.ApiClient;
 import com.example.prm_ai.network.GeminiApiRequest;
 import com.example.prm_ai.network.GeminiApiResponse;
 import com.example.prm_ai.network.GeminiApiService;
+import com.google.mlkit.nl.languageid.LanguageIdentification;
+import com.google.mlkit.nl.languageid.LanguageIdentifier;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
@@ -35,6 +37,8 @@ public class ResultActivity extends AppCompatActivity {
     private TextRecognizer recognizer;
     private GeminiApiService apiService;
     private DatabaseHelper dbHelper;
+    private LanguageIdentifier languageIdentifier;
+
     private int userId = -1;
     private long currentHistoryId = -1;
     private String currentPhotoPath;
@@ -53,6 +57,7 @@ public class ResultActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         apiService = ApiClient.getClient().create(GeminiApiService.class);
+        languageIdentifier = LanguageIdentification.getClient();
 
         currentPhotoPath = getIntent().getStringExtra("PHOTO_PATH");
         userId = getIntent().getIntExtra("USER_ID", -1);
@@ -71,8 +76,6 @@ public class ResultActivity extends AppCompatActivity {
                 Intent intent = new Intent(ResultActivity.this, QuizActivity.class);
                 intent.putExtra("HISTORY_ID", currentHistoryId);
                 startActivity(intent);
-            } else {
-                Toast.makeText(this, "Could not start quiz, history not saved.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -86,10 +89,10 @@ public class ResultActivity extends AppCompatActivity {
                 .addOnSuccessListener(visionText -> {
                     progressBarExtractedText.setVisibility(View.GONE);
                     extractedTextView.setVisibility(View.VISIBLE);
-                    
                     String extractedText = visionText.getText();
                     extractedTextView.setText(extractedText);
-                    summarizeText(extractedText);
+                    // ✅ Bắt đầu luồng xử lý mới: phát hiện ngôn ngữ rồi tóm tắt
+                    detectLanguageAndSummarize(extractedText);
                 })
                 .addOnFailureListener(e -> {
                     progressBarExtractedText.setVisibility(View.GONE);
@@ -98,16 +101,32 @@ public class ResultActivity extends AppCompatActivity {
                 });
     }
 
-    private void summarizeText(String text) {
+    private void detectLanguageAndSummarize(String text) {
         if (text == null || text.trim().isEmpty()) {
             summaryTextView.setText("No text to summarize.");
             return;
         }
+        // Phát hiện ngôn ngữ của văn bản
+        languageIdentifier.identifyLanguage(text)
+                .addOnSuccessListener(languageCode -> {
+                    if (languageCode.equals("und")) {
+                        languageCode = "en"; // Mặc định là tiếng Anh nếu không xác định được
+                    }
+                    // Yêu cầu tóm tắt bằng ngôn ngữ đã phát hiện
+                    summarizeInDetectedLanguage(text, languageCode);
+                })
+                .addOnFailureListener(e -> {
+                    // Nếu lỗi, mặc định dùng tiếng Anh
+                    summarizeInDetectedLanguage(text, "en");
+                });
+    }
 
+    private void summarizeInDetectedLanguage(String text, String detectedLanguageCode) {
         progressBarSummary.setVisibility(View.VISIBLE);
         summaryTextView.setVisibility(View.GONE);
 
-        String prompt = "Summarize the following text:\n\n" + text;
+        // ✅ Sửa đổi prompt: Yêu cầu tóm tắt bằng ngôn ngữ gốc
+        String prompt = "Summarize the following text in its original language, which is '" + detectedLanguageCode + "':\n\n" + text;
         GeminiApiRequest request = new GeminiApiRequest(prompt);
 
         apiService.generateContent(BuildConfig.GEMINI_API_KEY, request).enqueue(new Callback<GeminiApiResponse>() {
@@ -121,11 +140,10 @@ public class ResultActivity extends AppCompatActivity {
                     summaryTextView.setText(summary);
 
                     if (userId != -1 && currentPhotoPath != null) {
-                        currentHistoryId = dbHelper.addScanHistory(userId, currentPhotoPath, text, summary);
+                        // ✅ Lưu lại lịch sử với mã ngôn ngữ đã phát hiện
+                        currentHistoryId = dbHelper.addScanHistory(userId, currentPhotoPath, text, summary, null, detectedLanguageCode);
                     }
-                    
                     buttonTakeQuiz.setVisibility(View.VISIBLE);
-
                 } else {
                     summaryTextView.setText("Summarization failed.");
                 }

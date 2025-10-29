@@ -62,6 +62,8 @@ dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.1")
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0")
     implementation("com.google.mlkit:image-labeling:17.0.9")
+    // ✅ Sửa lại phiên bản đúng là 17.0.5
+    implementation("com.google.mlkit:language-id:17.0.5")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
