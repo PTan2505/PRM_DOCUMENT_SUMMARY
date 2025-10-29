@@ -25,7 +25,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 101;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_GALLERY_PICK = 2; // ✅ Mã yêu cầu mới
 
     private ImageView imageView;
     private Button extractButton;
@@ -44,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // ✅ Thiết lập Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -52,14 +55,21 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.imageView);
         extractButton = findViewById(R.id.extractButton);
-
         Button captureButton = findViewById(R.id.captureButton);
+        Button selectFromGalleryButton = findViewById(R.id.selectFromGalleryButton); // ✅
+
         captureButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             } else {
                 dispatchTakePictureIntent();
             }
+        });
+
+        // ✅ Xử lý sự kiện cho nút chọn từ thư viện
+        selectFromGalleryButton.setOnClickListener(v -> {
+            Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(pickPhoto, REQUEST_GALLERY_PICK);
         });
 
         extractButton.setOnClickListener(v -> {
@@ -72,6 +82,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
+                imageView.setImageBitmap(imageBitmap);
+                extractButton.setVisibility(View.VISIBLE);
+            } else if (requestCode == REQUEST_GALLERY_PICK) {
+                // ✅ Xử lý ảnh từ thư viện
+                if (data != null && data.getData() != null) {
+                    Uri imageUri = data.getData();
+                    try {
+                        // Sao chép ảnh vào tệp tạm thời để có đường dẫn nhất quán
+                        File photoFile = createImageFile(); 
+                        try (InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                             OutputStream outputStream = new FileOutputStream(photoFile)) {
+                            byte[] buf = new byte[1024];
+                            int len;
+                            while ((len = inputStream.read(buf)) > 0) {
+                                outputStream.write(buf, 0, len);
+                            }
+                        }
+                        Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
+                        imageView.setImageBitmap(imageBitmap);
+                        extractButton.setVisibility(View.VISIBLE);
+                    } catch (IOException e) {
+                        Toast.makeText(this, "Failed to load image from gallery", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
+    // Các phương thức khác không thay đổi...
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -115,16 +160,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Camera permission is required to use this feature", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
-            imageView.setImageBitmap(imageBitmap);
-            extractButton.setVisibility(View.VISIBLE);
         }
     }
 
