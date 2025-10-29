@@ -2,10 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Camera feature (optional vì có thể chọn từ thư viện) -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
-
-    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -20,35 +17,39 @@
         android:theme="@style/Theme.PRM_AI"
         tools:targetApi="31">
 
-        <!-- MainActivity -->
+        <!-- ✅ LoginActivity is now the starting point -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.NoActionBar"> 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- ✅ RegisterActivity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:parentActivityName=".LoginActivity"/>
+
+        <!-- MainActivity (no longer the launcher) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
         <!-- ResultActivity -->
         <activity
             android:name=".ResultActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
         </activity>
 
-        <!-- ML Kit metadata để tự động tải models -->
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ocr,image_labeling,document_scanner" />
 
-        <!--
-        FileProvider không cần thiết nữa vì Document Scanner tự quản lý files
-        Nhưng giữ lại nếu bạn muốn thêm tính năng chia sẻ/lưu ảnh sau này
-        -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.prm_ai.fileprovider"

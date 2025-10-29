@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -17,7 +18,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // ✅ Đọc API Key từ local.properties
         val localProperties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
 
@@ -27,7 +27,6 @@ android {
             }
         }
 
-        // Lưu vào BuildConfig
         val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY") ?: ""
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
@@ -42,7 +41,6 @@ android {
         }
     }
 
-    // ✅ Bật BuildConfig
     buildFeatures {
         buildConfig = true
     }
@@ -71,6 +69,11 @@ dependencies {
 
     // Logging (for debug)
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     // Testing
     testImplementation(libs.junit)
