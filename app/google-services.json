@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "968912612231-r59us9g7dvvvrfb3rktcbhti86n82jdp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.prm_ai",
+            "certificate_hash": "3719a3ebf5dc9e794c0d2c38f014c5b42e5bdab8"
+          }
+        },
+        {
           "client_id": "968912612231-e8omvqf4icfg9p27lmctgbat1hvsjvqn.apps.googleusercontent.com",
           "client_type": 3
         }
