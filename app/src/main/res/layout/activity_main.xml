@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:title="PRM AI Scanner"
+            app:title="AI Phân Tích Văn Bản"
             app:titleTextColor="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -37,15 +37,15 @@
             android:id="@+id/captureButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Capture Notes"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:text="Chụp ảnh văn bản" />
 
         <Button
             android:id="@+id/selectFromGalleryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="From Library"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="8dp"
+            android:text="Chọn ảnh từ thư viện" />
 
     </LinearLayout>
 
@@ -64,7 +64,7 @@
         android:id="@+id/extractButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Extract Text"
+        android:text="Trích xuất văn bản"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

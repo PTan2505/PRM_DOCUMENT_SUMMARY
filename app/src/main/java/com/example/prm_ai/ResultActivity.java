@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +18,6 @@ import com.example.prm_ai.network.GeminiApiRequest;
 import com.example.prm_ai.network.GeminiApiResponse;
 import com.example.prm_ai.network.GeminiApiService;
 import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
@@ -30,11 +30,13 @@ public class ResultActivity extends AppCompatActivity {
 
     private TextView extractedTextView, summaryTextView;
     private Button buttonTakeQuiz;
+    private ProgressBar progressBarSummary, progressBarExtractedText;
+
     private TextRecognizer recognizer;
     private GeminiApiService apiService;
     private DatabaseHelper dbHelper;
     private int userId = -1;
-    private long currentHistoryId = -1; // ✅ ID của bản ghi lịch sử hiện tại
+    private long currentHistoryId = -1;
     private String currentPhotoPath;
 
     @Override
@@ -45,8 +47,10 @@ public class ResultActivity extends AppCompatActivity {
         extractedTextView = findViewById(R.id.extractedTextView);
         summaryTextView = findViewById(R.id.summaryTextView);
         buttonTakeQuiz = findViewById(R.id.buttonTakeQuiz);
-        dbHelper = new DatabaseHelper(this);
+        progressBarSummary = findViewById(R.id.progressBarSummary);
+        progressBarExtractedText = findViewById(R.id.progressBarExtractedText);
 
+        dbHelper = new DatabaseHelper(this);
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         apiService = ApiClient.getClient().create(GeminiApiService.class);
 
@@ -65,7 +69,6 @@ public class ResultActivity extends AppCompatActivity {
         buttonTakeQuiz.setOnClickListener(v -> {
             if (currentHistoryId != -1) {
                 Intent intent = new Intent(ResultActivity.this, QuizActivity.class);
-                // ✅ Truyền ID lịch sử thay vì văn bản
                 intent.putExtra("HISTORY_ID", currentHistoryId);
                 startActivity(intent);
             } else {
@@ -75,14 +78,24 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void recognizeText(Bitmap bitmap) {
+        progressBarExtractedText.setVisibility(View.VISIBLE);
+        extractedTextView.setVisibility(View.GONE);
+
         InputImage image = InputImage.fromBitmap(bitmap, 0);
         recognizer.process(image)
                 .addOnSuccessListener(visionText -> {
+                    progressBarExtractedText.setVisibility(View.GONE);
+                    extractedTextView.setVisibility(View.VISIBLE);
+                    
                     String extractedText = visionText.getText();
                     extractedTextView.setText(extractedText);
                     summarizeText(extractedText);
                 })
-                .addOnFailureListener(e -> Toast.makeText(ResultActivity.this, "Text recognition failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    progressBarExtractedText.setVisibility(View.GONE);
+                    extractedTextView.setVisibility(View.VISIBLE);
+                    extractedTextView.setText("Text recognition failed: " + e.getMessage());
+                });
     }
 
     private void summarizeText(String text) {
@@ -91,22 +104,26 @@ public class ResultActivity extends AppCompatActivity {
             return;
         }
 
+        progressBarSummary.setVisibility(View.VISIBLE);
+        summaryTextView.setVisibility(View.GONE);
+
         String prompt = "Summarize the following text:\n\n" + text;
         GeminiApiRequest request = new GeminiApiRequest(prompt);
 
         apiService.generateContent(BuildConfig.GEMINI_API_KEY, request).enqueue(new Callback<GeminiApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
+                progressBarSummary.setVisibility(View.GONE);
+                summaryTextView.setVisibility(View.VISIBLE);
+
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String summary = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
                     summaryTextView.setText(summary);
 
-                    // ✅ Tạo bản ghi lịch sử và lưu ID
                     if (userId != -1 && currentPhotoPath != null) {
                         currentHistoryId = dbHelper.addScanHistory(userId, currentPhotoPath, text, summary);
                     }
                     
-                    // Hiển thị nút Quiz
                     buttonTakeQuiz.setVisibility(View.VISIBLE);
 
                 } else {
@@ -116,7 +133,9 @@ public class ResultActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
-                summaryTextView.setText("Summarization failed.");
+                progressBarSummary.setVisibility(View.GONE);
+                summaryTextView.setVisibility(View.VISIBLE);
+                summaryTextView.setText("Summarization failed: " + t.getMessage());
             }
         });
     }

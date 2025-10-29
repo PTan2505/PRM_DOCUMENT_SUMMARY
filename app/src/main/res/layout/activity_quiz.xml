@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                tools:text="Question 1/3" />
+                tools:text="Question 1/10" />
 
             <TextView
                 android:id="@+id/textViewQuestion"
@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="24dp"
-                android:text="Submit" />
+                android:text="Nộp" />
         </LinearLayout>
 
         <!-- Kết quả -->
@@ -67,13 +67,13 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:visibility="gone"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Your Score:"
-                android:textSize="24sp"/>
+                android:text="Kết quả:"
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/textViewScore"
@@ -81,14 +81,29 @@
                 android:layout_height="wrap_content"
                 android:textSize="48sp"
                 android:textStyle="bold"
-                tools:text="2/3" />
+                tools:text="8/10" />
 
-             <Button
-                android:id="@+id/buttonFinishQuiz"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Finish"/>
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp">
+
+                <!-- ✅ Nút Thống kê -->
+                <Button
+                    android:id="@+id/buttonStatistics"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Chi tiết" />
+
+                <Button
+                    android:id="@+id/buttonFinishQuiz"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hoàn thành"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -47,7 +47,7 @@
             android:name=".HistoryActivity"
             android:exported="false"
             android:label="Scan History"
-            android:parentActivityName=".MainActivity" />
+            android.parentActivityName=".MainActivity" />
             
         <activity
             android:name=".QuizActivity"
@@ -55,11 +55,17 @@
             android:label="Quiz"
             android:parentActivityName=".ResultActivity" />
 
-        <!-- ✅ HistoryDetailActivity -->
         <activity
             android:name=".HistoryDetailActivity"
             android:exported="false"
             android:parentActivityName=".HistoryActivity" />
+            
+        <!-- ✅ StatisticsActivity -->
+        <activity
+            android:name=".StatisticsActivity"
+            android:exported="false"
+            android:label="Quiz Statistics"
+            android:parentActivityName=".QuizActivity" />
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"

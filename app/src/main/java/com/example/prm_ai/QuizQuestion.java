@@ -1,10 +1,11 @@
 package com.example.prm_ai;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.List;
 
-// Lớp này đại diện cho một câu hỏi duy nhất
-public class QuizQuestion {
+// ✅ Implement Serializable
+public class QuizQuestion implements Serializable {
 
     @SerializedName("question")
     private String question;

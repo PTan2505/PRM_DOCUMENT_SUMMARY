@@ -23,10 +23,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AI Summary"
+            android:layout_marginTop="16dp"
+            android:text="AI Tóm tắt"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textViewSummaryDetail"
@@ -45,16 +45,16 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/quizScoreLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Last Quiz Score:"
-                android:textSize="18sp"
                 android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"/>
+                android:text="Kết quả lần cuối:"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/textViewScoreDetail"
@@ -64,15 +64,28 @@
                 android:layout_marginStart="8dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_centerVertical="true"
-                tools:text="3/5" />
+                tools:text="8/10" />
 
-            <Button
-                android:id="@+id/buttonStartQuizDetail"
+            <!-- ✅ Container cho các nút -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Retake Quiz"
-                android:layout_alignParentEnd="true"/>
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true">
+
+                <Button
+                    android:id="@+id/buttonReviewQuiz"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chi tiết" />
+
+                <Button
+                    android:id="@+id/buttonStartQuizDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Làm Lại" />
+            </LinearLayout>
 
         </RelativeLayout>
 

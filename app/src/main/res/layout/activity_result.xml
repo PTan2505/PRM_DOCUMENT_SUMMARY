@@ -14,21 +14,14 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/labelsTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Analyzing image..."
-            android:textStyle="italic"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Extracted Text"
+            android:text="Văn bản trích xuất"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
+        <!-- ✅ Khu vực trích xuất văn bản với ProgressBar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,24 +29,41 @@
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
-            <TextView
-                android:id="@+id/extractedTextView"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:textSize="16sp" />
+                android:minHeight="120dp">
+
+                <ProgressBar
+                    android:id="@+id/progressBarExtractedText"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+                <TextView
+                    android:id="@+id/extractedTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </RelativeLayout>
 
         </androidx.cardview.widget.CardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AI Summary"
+            android:text="AI Tóm tắt"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"/>
 
+        <!-- Khu vực tóm tắt với ProgressBar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,21 +71,37 @@
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
-            <TextView
-                android:id="@+id/summaryTextView"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:textSize="16sp" />
+                android:minHeight="120dp">
+
+                <ProgressBar
+                    android:id="@+id/progressBarSummary"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+                <TextView
+                    android:id="@+id/summaryTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    tools:text="Đây là bản tóm tắt mẫu."
+                    tools:visibility="visible" />
+
+            </RelativeLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- ✅ Nút Làm Quiz -->
         <Button
             android:id="@+id/buttonTakeQuiz"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Take Quiz"
+            android:text="Làm Quiz"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:visibility="gone" 

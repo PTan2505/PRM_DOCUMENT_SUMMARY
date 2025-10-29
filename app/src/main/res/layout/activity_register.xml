@@ -12,11 +12,11 @@
         android:id="@+id/textViewRegisterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Account"
-        android:textSize="32sp"
-        android:textStyle="bold"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"/>
+        android:layout_marginTop="40dp"
+        android:text="Đăng ký"
+        android:textSize="32sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/editTextUsername"
@@ -35,10 +35,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextUsername"
         android:layout_marginTop="20dp"
-        android:hint="Password"
+        android:background="@drawable/edit_text_background"
+        android:hint="Mật khẩu"
         android:inputType="textPassword"
-        android:padding="15dp"
-        android:background="@drawable/edit_text_background"/>
+        android:padding="15dp" />
 
     <EditText
         android:id="@+id/editTextConfirmPassword"
@@ -46,10 +46,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextPassword"
         android:layout_marginTop="20dp"
-        android:hint="Confirm Password"
+        android:background="@drawable/edit_text_background"
+        android:hint="Xác nhận mật khẩu"
         android:inputType="textPassword"
-        android:padding="15dp"
-        android:background="@drawable/edit_text_background"/>
+        android:padding="15dp" />
 
     <Button
         android:id="@+id/buttonRegister"
@@ -57,8 +57,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextConfirmPassword"
         android:layout_marginTop="30dp"
-        android:text="Register"
-        android:padding="15dp"/>
+        android:padding="15dp"
+        android:text="Đăng ký" />
 
     <TextView
         android:id="@+id/textViewLogin"
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Already have an account? Login Now"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:text="Bạn đã có tài khoản? Đăng nhập" />
 
 </RelativeLayout>

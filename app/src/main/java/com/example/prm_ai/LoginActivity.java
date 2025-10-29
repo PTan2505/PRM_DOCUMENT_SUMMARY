@@ -28,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.UUID;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 9001;
@@ -50,9 +52,8 @@ public class LoginActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         mAuth = FirebaseAuth.getInstance();
 
-        // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Use your web client ID
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -79,7 +80,6 @@ public class LoginActivity extends AppCompatActivity {
 
         Cursor cursor = dbHelper.checkUser(username, password);
         if (cursor != null && cursor.moveToFirst()) {
-            // Lấy ID người dùng
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_USER_ID));
             cursor.close();
             
@@ -99,16 +99,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
             }
@@ -118,29 +114,57 @@ public class LoginActivity extends AppCompatActivity {
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(LoginActivity.this, "Google Sign-In Success.", Toast.LENGTH_SHORT).show();
-                            
-                            // Google user doesn't have a local ID in the same way, you can pass a special value e.g., -1
-                            navigateToMain(-1);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "signInWithCredential:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // ✅ Đồng bộ hóa người dùng Google với DB cục bộ
+                            handleGoogleUser(user);
                         }
+                    } else {
+                        Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        Toast.makeText(LoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void handleGoogleUser(FirebaseUser firebaseUser) {
+        String email = firebaseUser.getEmail();
+        if (email == null) {
+            Toast.makeText(this, "Could not get email from Google Account.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Cursor cursor = dbHelper.getUserByUsername(email);
+        if (cursor != null && cursor.moveToFirst()) {
+            // Người dùng đã tồn tại trong DB cục bộ
+            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_USER_ID));
+            cursor.close();
+            Toast.makeText(this, "Welcome back, " + email, Toast.LENGTH_SHORT).show();
+            navigateToMain(userId);
+        } else {
+            // Người dùng chưa tồn tại, tạo mới trong DB cục bộ
+            String randomPassword = UUID.randomUUID().toString(); // Mật khẩu ngẫu nhiên
+            if (dbHelper.addUser(email, randomPassword)) {
+                // Lấy lại ID của người dùng vừa tạo
+                Cursor newUserCursor = dbHelper.getUserByUsername(email);
+                if (newUserCursor != null && newUserCursor.moveToFirst()) {
+                    int userId = newUserCursor.getInt(newUserCursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_USER_ID));
+                    newUserCursor.close();
+                    Toast.makeText(this, "Welcome, " + email, Toast.LENGTH_SHORT).show();
+                    navigateToMain(userId);
+                } else {
+                     Toast.makeText(this, "Failed to create local user profile.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Failed to create local user profile.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
     
     private void navigateToMain(int userId) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        // Pass user id to MainActivity
         intent.putExtra("USER_ID", userId);
         startActivity(intent);
         finish();

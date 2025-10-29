@@ -9,8 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "UserAuth.db";
-    public static final int DATABASE_VERSION = 4; // ✅ Nâng cấp phiên bản DB
+    public static final int DATABASE_VERSION = 5; // Version is now 5
 
+    // Tables and columns...
     public static final String TABLE_USERS = "users";
     public static final String COLUMN_USER_ID = "id";
     public static final String COLUMN_USERNAME = "username";
@@ -23,9 +24,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ORIGINAL_TEXT = "original_text";
     public static final String COLUMN_SUMMARY_TEXT = "summary_text";
     public static final String COLUMN_TIMESTAMP = "timestamp";
-    public static final String COLUMN_QUIZ_JSON = "quiz_data_json"; // ✅ Cột mới cho dữ liệu quiz
-    public static final String COLUMN_QUIZ_SCORE = "quiz_score";   // ✅ Cột mới cho điểm số
-
+    public static final String COLUMN_QUIZ_JSON = "quiz_data_json";
+    public static final String COLUMN_QUIZ_SCORE = "quiz_score";
+    public static final String COLUMN_LAST_USER_ANSWERS_JSON = "last_user_answers_json"; // New column
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -47,6 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_SUMMARY_TEXT + " TEXT, " +
                 COLUMN_QUIZ_JSON + " TEXT, " +
                 COLUMN_QUIZ_SCORE + " INTEGER, " +
+                COLUMN_LAST_USER_ANSWERS_JSON + " TEXT, " +
                 COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
                 "FOREIGN KEY(" + COLUMN_HISTORY_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + "));";
         db.execSQL(createHistorySql);
@@ -61,47 +63,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + TABLE_SCAN_HISTORY + " ADD COLUMN " + COLUMN_QUIZ_JSON + " TEXT;");
             db.execSQL("ALTER TABLE " + TABLE_SCAN_HISTORY + " ADD COLUMN " + COLUMN_QUIZ_SCORE + " INTEGER;");
         }
+        if (oldVersion < 5) {
+             db.execSQL("ALTER TABLE " + TABLE_SCAN_HISTORY + " ADD COLUMN " + COLUMN_LAST_USER_ANSWERS_JSON + " TEXT;");
+        }
     }
 
-    // ✅ addScanHistory giờ trả về ID của hàng mới được chèn
-    public long addScanHistory(int userId, String imagePath, String originalText, String summaryText) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_HISTORY_USER_ID, userId);
-        values.put(COLUMN_IMAGE_PATH, imagePath);
-        values.put(COLUMN_ORIGINAL_TEXT, originalText);
-        values.put(COLUMN_SUMMARY_TEXT, summaryText);
-        return db.insert(TABLE_SCAN_HISTORY, null, values);
-    }
-
-    // ✅ Phương thức mới để cập nhật dữ liệu Quiz
-    public void updateQuizData(long historyId, String quizJson) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_QUIZ_JSON, quizJson);
-        db.update(TABLE_SCAN_HISTORY, values, COLUMN_HISTORY_ID + " = ?", new String[]{String.valueOf(historyId)});
-    }
-
-    // ✅ Phương thức mới để cập nhật điểm Quiz
-    public void updateQuizScore(long historyId, int score) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_QUIZ_SCORE, score);
-        db.update(TABLE_SCAN_HISTORY, values, COLUMN_HISTORY_ID + " = ?", new String[]{String.valueOf(historyId)});
-    }
-
-    // ✅ Lấy một mục lịch sử duy nhất bằng ID
-    public Cursor getHistoryItem(long historyId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(TABLE_SCAN_HISTORY, null, COLUMN_HISTORY_ID + " = ?", new String[]{String.valueOf(historyId)}, null, null, null);
-    }
-
-    public Cursor getScanHistory(int userId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(TABLE_SCAN_HISTORY, null, COLUMN_HISTORY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, COLUMN_TIMESTAMP + " DESC");
-    }
-    
-    // Các phương thức người dùng không đổi
+    // User methods...
     public boolean addUser(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -113,5 +80,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor checkUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(TABLE_USERS, new String[]{COLUMN_USER_ID, COLUMN_USERNAME}, COLUMN_USERNAME + " = ? AND " + COLUMN_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
+    }
+    
+    public Cursor getUserByUsername(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_USERS, new String[]{COLUMN_USER_ID, COLUMN_USERNAME}, COLUMN_USERNAME + " = ?", new String[]{username}, null, null, null);
+    }
+
+    // History methods...
+    public long addScanHistory(int userId, String imagePath, String originalText, String summaryText) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_HISTORY_USER_ID, userId);
+        values.put(COLUMN_IMAGE_PATH, imagePath);
+        values.put(COLUMN_ORIGINAL_TEXT, originalText);
+        values.put(COLUMN_SUMMARY_TEXT, summaryText);
+        return db.insert(TABLE_SCAN_HISTORY, null, values);
+    }
+
+    public void updateQuizData(long historyId, String quizJson) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_QUIZ_JSON, quizJson);
+        db.update(TABLE_SCAN_HISTORY, values, COLUMN_HISTORY_ID + " = ?", new String[]{String.valueOf(historyId)});
+    }
+
+    public void updateQuizAttempt(long historyId, int score, String userAnswersJson) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_QUIZ_SCORE, score);
+        values.put(COLUMN_LAST_USER_ANSWERS_JSON, userAnswersJson);
+        db.update(TABLE_SCAN_HISTORY, values, COLUMN_HISTORY_ID + " = ?", new String[]{String.valueOf(historyId)});
+    }
+
+    public Cursor getHistoryItem(long historyId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_SCAN_HISTORY, null, COLUMN_HISTORY_ID + " = ?", new String[]{String.valueOf(historyId)}, null, null, null);
+    }
+
+    public Cursor getScanHistory(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_SCAN_HISTORY, null, COLUMN_HISTORY_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, COLUMN_TIMESTAMP + " DESC");
     }
 }

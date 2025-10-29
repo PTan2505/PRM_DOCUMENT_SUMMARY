@@ -1,6 +1,8 @@
 package com.example.prm_ai;
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.prm_ai.network.ApiClient;
 import com.example.prm_ai.network.GeminiApiRequest;
@@ -21,6 +24,8 @@ import com.example.prm_ai.network.GeminiApiService;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,7 +38,7 @@ public class QuizActivity extends AppCompatActivity {
     private LinearLayout quizContainer, scoreContainer;
     private TextView textViewQuestionNumber, textViewQuestion, textViewScore;
     private RadioGroup radioGroupOptions;
-    private Button buttonSubmitQuiz, buttonFinishQuiz;
+    private Button buttonSubmitQuiz, buttonFinishQuiz, buttonStatistics;
 
     private GeminiApiService apiService;
     private DatabaseHelper dbHelper;
@@ -41,13 +46,15 @@ public class QuizActivity extends AppCompatActivity {
     private List<QuizQuestion> questions;
     private int currentQuestionIndex = 0;
     private int score = 0;
+    private boolean isAnswerSubmitted = false;
+
+    private ArrayList<String> userAnswers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        // Khởi tạo Views
         progressBarQuiz = findViewById(R.id.progressBarQuiz);
         quizContainer = findViewById(R.id.quizContainer);
         scoreContainer = findViewById(R.id.scoreContainer);
@@ -57,6 +64,7 @@ public class QuizActivity extends AppCompatActivity {
         radioGroupOptions = findViewById(R.id.radioGroupOptions);
         buttonSubmitQuiz = findViewById(R.id.buttonSubmitQuiz);
         buttonFinishQuiz = findViewById(R.id.buttonFinishQuiz);
+        buttonStatistics = findViewById(R.id.buttonStatistics);
 
         apiService = ApiClient.getClient().create(GeminiApiService.class);
         dbHelper = new DatabaseHelper(this);
@@ -71,8 +79,77 @@ public class QuizActivity extends AppCompatActivity {
 
         buttonSubmitQuiz.setOnClickListener(v -> handleSubmit());
         buttonFinishQuiz.setOnClickListener(v -> finish());
+        
+        buttonStatistics.setOnClickListener(v -> {
+            Intent intent = new Intent(QuizActivity.this, StatisticsActivity.class);
+            intent.putExtra("QUESTIONS", (Serializable) questions);
+            intent.putStringArrayListExtra("USER_ANSWERS", userAnswers);
+            startActivity(intent);
+        });
     }
 
+    private void handleSubmit() {
+        if (!isAnswerSubmitted) {
+            int selectedId = radioGroupOptions.getCheckedRadioButtonId();
+            if (selectedId == -1) {
+                Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
+                radioGroupOptions.getChildAt(i).setEnabled(false);
+            }
+
+            RadioButton selectedRadioButton = findViewById(selectedId);
+            String selectedAnswer = selectedRadioButton.getText().toString();
+            userAnswers.add(selectedAnswer); 
+            String correctAnswer = questions.get(currentQuestionIndex).getAnswer();
+
+            if (selectedAnswer.equals(correctAnswer)) {
+                score++;
+                selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+            } else {
+                selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
+                for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
+                    RadioButton button = (RadioButton) radioGroupOptions.getChildAt(i);
+                    if (button.getText().toString().equals(correctAnswer)) {
+                        button.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+                        break;
+                    }
+                }
+            }
+
+            isAnswerSubmitted = true;
+            if (currentQuestionIndex < questions.size() - 1) {
+                buttonSubmitQuiz.setText("Tiếp");
+            } else {
+                buttonSubmitQuiz.setText("Hoàn thành");
+            }
+
+        } else {
+            if(userAnswers.size() <= currentQuestionIndex){
+                 userAnswers.add("");
+            }
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.size()) {
+                displayQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+    }
+
+    private void showFinalScore() {
+        quizContainer.setVisibility(View.GONE);
+        scoreContainer.setVisibility(View.VISIBLE);
+        textViewScore.setText(score + "/" + questions.size());
+
+        // Convert user answers to JSON and save to the database
+        String userAnswersJson = new Gson().toJson(userAnswers);
+        dbHelper.updateQuizAttempt(historyId, score, userAnswersJson);
+    }
+    
+    // Other methods remain the same...
     private void loadQuiz() {
         progressBarQuiz.setVisibility(View.VISIBLE);
         quizContainer.setVisibility(View.GONE);
@@ -84,10 +161,8 @@ public class QuizActivity extends AppCompatActivity {
             cursor.close();
 
             if (quizJson != null && !quizJson.trim().isEmpty()) {
-                // Đã có quiz, tải và bắt đầu
                 parseQuizJson(quizJson);
             } else {
-                // Chưa có quiz, tạo mới
                 generateQuiz(originalText);
             }
         } else {
@@ -96,7 +171,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateQuiz(String text) {
-        String prompt = "Based on the following text, generate exactly 5 multiple-choice questions. " +
+        String prompt = "Based on the following text, generate exactly 10 multiple-choice questions. " +
                 "Provide the output in a clean JSON format. The JSON should be an object with a single key 'questions'. " +
                 "This key should hold an array of question objects. Each object must have three keys: 'question' (the question text), " +
                 "'options' (an array of 4 string choices), and 'answer' (the correct choice text). " +
@@ -111,9 +186,7 @@ public class QuizActivity extends AppCompatActivity {
                     String jsonResponse = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
                     String cleanJson = jsonResponse.substring(jsonResponse.indexOf("{"), jsonResponse.lastIndexOf("}") + 1);
 
-                    // ✅ Lưu quiz vừa tạo vào DB
                     dbHelper.updateQuizData(historyId, cleanJson);
-
                     parseQuizJson(cleanJson);
                 } else {
                     showError("Failed to generate quiz. Please try again.");
@@ -146,6 +219,9 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void displayQuestion() {
+        isAnswerSubmitted = false;
+        buttonSubmitQuiz.setText("Submit");
+
         QuizQuestion currentQuestion = questions.get(currentQuestionIndex);
         textViewQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + "/" + questions.size());
         textViewQuestion.setText(currentQuestion.getQuestion());
@@ -154,46 +230,13 @@ public class QuizActivity extends AppCompatActivity {
         for (String option : currentQuestion.getOptions()) {
             RadioButton radioButton = new RadioButton(this);
             radioButton.setText(option);
+            radioButton.setPadding(20, 20, 20, 20);
+            radioButton.setTextColor(Color.BLACK);
             radioGroupOptions.addView(radioButton);
         }
         radioGroupOptions.clearCheck();
     }
-
-    private void handleSubmit() {
-        int selectedId = radioGroupOptions.getCheckedRadioButtonId();
-        if (selectedId == -1) {
-            Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        RadioButton selectedRadioButton = findViewById(selectedId);
-        String selectedAnswer = selectedRadioButton.getText().toString();
-        String correctAnswer = questions.get(currentQuestionIndex).getAnswer();
-
-        if (selectedAnswer.equals(correctAnswer)) {
-            score++;
-            Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Wrong! The correct answer was: " + correctAnswer, Toast.LENGTH_LONG).show();
-        }
-
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.size()) {
-            displayQuestion();
-        } else {
-            showFinalScore();
-        }
-    }
-
-    private void showFinalScore() {
-        quizContainer.setVisibility(View.GONE);
-        scoreContainer.setVisibility(View.VISIBLE);
-        textViewScore.setText(score + "/" + questions.size());
-
-        // ✅ Lưu điểm số cuối cùng vào DB
-        dbHelper.updateQuizScore(historyId, score);
-    }
-
+    
     private void showError(String message) {
         progressBarQuiz.setVisibility(View.GONE);
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
