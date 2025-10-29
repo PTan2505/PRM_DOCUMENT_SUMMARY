@@ -1,8 +1,11 @@
 package com.example.prm_ai;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,16 +17,10 @@ import com.example.prm_ai.network.GeminiApiRequest;
 import com.example.prm_ai.network.GeminiApiResponse;
 import com.example.prm_ai.network.GeminiApiService;
 import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.label.ImageLabel;
-import com.google.mlkit.vision.label.ImageLabeler;
-import com.google.mlkit.vision.label.ImageLabeling;
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,14 +28,13 @@ import retrofit2.Response;
 
 public class ResultActivity extends AppCompatActivity {
 
-    private TextView extractedTextView;
-    private TextView summaryTextView;
-    private TextView labelsTextView;
+    private TextView extractedTextView, summaryTextView;
+    private Button buttonTakeQuiz;
     private TextRecognizer recognizer;
-    private ImageLabeler imageLabeler;
     private GeminiApiService apiService;
     private DatabaseHelper dbHelper;
     private int userId = -1;
+    private long currentHistoryId = -1; // ✅ ID của bản ghi lịch sử hiện tại
     private String currentPhotoPath;
 
     @Override
@@ -48,61 +44,34 @@ public class ResultActivity extends AppCompatActivity {
 
         extractedTextView = findViewById(R.id.extractedTextView);
         summaryTextView = findViewById(R.id.summaryTextView);
-        labelsTextView = findViewById(R.id.labelsTextView);
+        buttonTakeQuiz = findViewById(R.id.buttonTakeQuiz);
         dbHelper = new DatabaseHelper(this);
 
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        imageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
         apiService = ApiClient.getClient().create(GeminiApiService.class);
 
-        // Get data from Intent
         currentPhotoPath = getIntent().getStringExtra("PHOTO_PATH");
         userId = getIntent().getIntExtra("USER_ID", -1);
 
         if (currentPhotoPath != null) {
             Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
             if (imageBitmap != null) {
-                // Phân loại nội dung ảnh
-                labelImage(imageBitmap);
-                // Trích xuất văn bản
                 recognizeText(imageBitmap);
             }
         } else {
             Toast.makeText(this, "Error: Photo not found.", Toast.LENGTH_SHORT).show();
         }
-    }
 
-    private void labelImage(Bitmap bitmap) {
-        InputImage image = InputImage.fromBitmap(bitmap, 0);
-
-        imageLabeler.process(image)
-                .addOnSuccessListener(labels -> {
-                    if (labels.isEmpty()) {
-                        labelsTextView.setText("Không tìm thấy nhãn nào.");
-                        return;
-                    }
-
-                    // Xây dựng chuỗi kết quả phân loại
-                    StringBuilder labelText = new StringBuilder();
-                    for (int i = 0; i < labels.size() && i < 5; i++) {
-                        ImageLabel label = labels.get(i);
-                        labelText.append("• ")
-                                .append(label.getText())
-                                .append(" (")
-                                .append(String.format("%.1f%%", label.getConfidence() * 100))
-                                .append(")");
-                        if (i < labels.size() - 1 && i < 4) {
-                            labelText.append("\n");
-                        }
-                    }
-
-                    labelsTextView.setText(labelText.toString());
-                    labelsTextView.setTypeface(null, android.graphics.Typeface.NORMAL);
-                })
-                .addOnFailureListener(e -> {
-                    labelsTextView.setText("Phân loại thất bại: " + e.getMessage());
-                    Toast.makeText(ResultActivity.this, "Image labeling failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        buttonTakeQuiz.setOnClickListener(v -> {
+            if (currentHistoryId != -1) {
+                Intent intent = new Intent(ResultActivity.this, QuizActivity.class);
+                // ✅ Truyền ID lịch sử thay vì văn bản
+                intent.putExtra("HISTORY_ID", currentHistoryId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Could not start quiz, history not saved.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void recognizeText(Bitmap bitmap) {
@@ -122,7 +91,7 @@ public class ResultActivity extends AppCompatActivity {
             return;
         }
 
-        String prompt = "Summarize the following text and generate 3 quiz questions with answers based on it:\n\n" + text;
+        String prompt = "Summarize the following text:\n\n" + text;
         GeminiApiRequest request = new GeminiApiRequest(prompt);
 
         apiService.generateContent(BuildConfig.GEMINI_API_KEY, request).enqueue(new Callback<GeminiApiResponse>() {
@@ -132,18 +101,22 @@ public class ResultActivity extends AppCompatActivity {
                     String summary = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
                     summaryTextView.setText(summary);
 
-                    // Lưu lịch sử với đường dẫn ảnh
+                    // ✅ Tạo bản ghi lịch sử và lưu ID
                     if (userId != -1 && currentPhotoPath != null) {
-                        dbHelper.addScanHistory(userId, currentPhotoPath, text, summary);
+                        currentHistoryId = dbHelper.addScanHistory(userId, currentPhotoPath, text, summary);
                     }
+                    
+                    // Hiển thị nút Quiz
+                    buttonTakeQuiz.setVisibility(View.VISIBLE);
+
                 } else {
-                    summaryTextView.setText("Summarization failed. Please check your API key and network connection.");
+                    summaryTextView.setText("Summarization failed.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
-                summaryTextView.setText("Summarization failed. Please check your network connection.");
+                summaryTextView.setText("Summarization failed.");
             }
         });
     }
