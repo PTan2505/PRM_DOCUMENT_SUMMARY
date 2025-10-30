@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.prm_ai.network.ApiClient;
@@ -23,10 +23,8 @@ import com.example.prm_ai.network.GeminiApiResponse;
 import com.example.prm_ai.network.GeminiApiService;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class QuizActivity extends AppCompatActivity {
+public class QuizActivity extends BaseActivity {
 
     private ProgressBar progressBarQuiz;
     private LinearLayout quizContainer, scoreContainer;
@@ -88,8 +86,6 @@ public class QuizActivity extends AppCompatActivity {
                 intent.putExtra("QUESTIONS", (Serializable) questions);
                 intent.putStringArrayListExtra("USER_ANSWERS", userAnswers);
                 startActivity(intent);
-            } else {
-                Toast.makeText(this, "No quiz data available for statistics.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -101,32 +97,30 @@ public class QuizActivity extends AppCompatActivity {
         Cursor cursor = dbHelper.getHistoryItem(historyId);
         if (cursor != null && cursor.moveToFirst()) {
             String quizJson = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_JSON));
-            String originalText = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ORIGINAL_TEXT));
-            // ✅ Lấy mã ngôn ngữ đã lưu
-            String languageCode = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LANGUAGE_CODE));
+            String originalSummary = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SUMMARY_TEXT));
+            String translatedSummary = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TRANSLATED_SUMMARY));
             cursor.close();
+
+            String contentForQuiz = !TextUtils.isEmpty(translatedSummary) ? translatedSummary : originalSummary;
 
             if (quizJson != null && !quizJson.trim().isEmpty()) {
                 parseQuizJson(quizJson);
             } else {
-                // ✅ Tạo quiz theo ngôn ngữ đã phát hiện
-                generateQuiz(originalText, languageCode);
+                generateQuizInVietnamese(contentForQuiz);
             }
         } else {
             showError("Could not find history item to start quiz.");
         }
     }
 
-    // ✅ generateQuiz giờ sẽ dựa trên ngôn ngữ được truyền vào
-    private void generateQuiz(String text, String languageCode) {
-        String languageName = getLanguageName(languageCode);
-        
-        String prompt = "Based on the following text, generate exactly 10 multiple-choice questions in " + languageName + ". " +
-                "The entire JSON output, including keys and values, MUST be in " + languageName + ". " +
-                "Provide the output in a clean JSON format. The JSON should be an object with a single key 'questions'. " +
-                "This key should hold an array of question objects. Each object must have three keys: 'question' (the question text), " +
-                "'options' (an array of 4 string choices), and 'answer' (the correct choice text). " +
-                "Do not include any text outside of the JSON object.\n\nText: " + text;
+    private void generateQuizInVietnamese(String text) {
+        String prompt = "Dựa trên văn bản sau, hãy tạo 10 câu hỏi trắc nghiệm. " +
+                "YÊU CẦU QUAN TRỌNG: Chỉ trả về một đối tượng JSON sạch, không có markdown hay bất kỳ văn bản nào khác. " +
+                "Cấu trúc JSON phải có một khóa gốc duy nhất là \"questions\". " +
+                "Giá trị của khóa \"questions\" phải là một mảng các đối tượng. " +
+                "Mỗi đối tượng phải có các khóa bằng Tiếng Anh: \"question\", \"options\" (mảng 4 chuỗi), và \"answer\". " +
+                "Nội dung (value) cho các khóa đó phải bằng Tiếng Việt. " +
+                "Văn bản: " + text;
 
         GeminiApiRequest request = new GeminiApiRequest(prompt);
 
@@ -135,57 +129,46 @@ public class QuizActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String jsonResponse = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    String cleanJson = jsonResponse.substring(jsonResponse.indexOf("{"), jsonResponse.lastIndexOf("}") + 1);
+                    String cleanJson = jsonResponse.replaceAll("```json|```", "").trim();
 
                     dbHelper.updateQuizData(historyId, cleanJson);
                     parseQuizJson(cleanJson);
                 } else {
-                    showError("Failed to generate quiz. Please try again.");
+                    showError("Failed to generate quiz from API.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
-                showError("Network error. Could not generate quiz.");
+                showError("Network error while generating quiz: " + t.getMessage());
             }
         });
-    }
-
-    private String getLanguageName(String languageCode) {
-        switch (languageCode) {
-            case "vi": return "Vietnamese";
-            case "en": return "English";
-            // Thêm các ngôn ngữ khác nếu cần
-            default: return "English";
-        }
     }
 
     private void parseQuizJson(String json) {
         try {
             Gson gson = new Gson();
             QuizResponse quizResponse = gson.fromJson(json, QuizResponse.class);
-            if (quizResponse != null) {
-                questions = quizResponse.getQuestions();
-            }
 
-            if (questions != null && !questions.isEmpty()) {
+            if (quizResponse != null && quizResponse.getQuestions() != null && !quizResponse.getQuestions().isEmpty()) {
+                questions = quizResponse.getQuestions();
                 progressBarQuiz.setVisibility(View.GONE);
                 quizContainer.setVisibility(View.VISIBLE);
                 displayQuestion();
             } else {
-                showError("Could not parse quiz questions.");
+                showError("Could not parse quiz questions from JSON. Check AI response format.");
             }
         } catch (JsonSyntaxException e) {
-            showError("Error in quiz data format from server.");
+            showError("JSON Syntax Error: " + e.getMessage());
         }
     }
 
     private void displayQuestion() {
         isAnswerSubmitted = false;
-        buttonSubmitQuiz.setText("Submit");
+        buttonSubmitQuiz.setText(R.string.quiz_submit);
 
         QuizQuestion currentQuestion = questions.get(currentQuestionIndex);
-        textViewQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + "/" + questions.size());
+        textViewQuestionNumber.setText(getString(R.string.quiz_question_title, currentQuestionIndex + 1, questions.size()));
         textViewQuestion.setText(currentQuestion.getQuestion());
 
         radioGroupOptions.removeAllViews();
@@ -203,7 +186,7 @@ public class QuizActivity extends AppCompatActivity {
         if (!isAnswerSubmitted) {
             int selectedId = radioGroupOptions.getCheckedRadioButtonId();
             if (selectedId == -1) {
-                Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.quiz_please_select_answer, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -232,9 +215,9 @@ public class QuizActivity extends AppCompatActivity {
 
             isAnswerSubmitted = true;
             if (currentQuestionIndex < questions.size() - 1) {
-                buttonSubmitQuiz.setText("Next");
+                buttonSubmitQuiz.setText(R.string.quiz_next);
             } else {
-                buttonSubmitQuiz.setText("Finish");
+                buttonSubmitQuiz.setText(R.string.quiz_finish);
             }
 
         } else {

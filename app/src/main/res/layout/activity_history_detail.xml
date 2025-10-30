@@ -21,10 +21,11 @@
             tools:src="@mipmap/ic_launcher" />
 
         <TextView
+            android:id="@+id/textViewSummaryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="AI Tóm tắt"
+            android:text="@string/history_detail_summary_title"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -35,6 +36,27 @@
             android:layout_marginTop="8dp"
             android:textSize="16sp"
             tools:text="This is a summary of the scanned document." />
+
+        <TextView
+            android:id="@+id/textViewTranslatedSummaryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/history_detail_translated_summary_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/textViewTranslatedSummaryDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:text="This is the translated summary." 
+            tools:visibility="visible"/>
 
         <View
             android:layout_width="match_parent"
@@ -53,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:text="Kết quả lần cuối:"
+                android:text="@string/history_detail_last_score"
                 android:textSize="18sp" />
 
             <TextView
@@ -66,7 +88,6 @@
                 android:textStyle="bold"
                 tools:text="8/10" />
 
-            <!-- ✅ Container cho các nút -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -78,13 +99,13 @@
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chi tiết" />
+                    android:text="@string/history_detail_review" />
 
                 <Button
                     android:id="@+id/buttonStartQuizDetail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Làm Lại" />
+                    android:text="@string/history_detail_retake" />
             </LinearLayout>
 
         </RelativeLayout>

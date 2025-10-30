@@ -17,24 +17,24 @@
             android:id="@+id/textViewStatQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Question: What is the capital of France?"
-            android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:text="Câu hỏi: What is the capital of France?"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <!-- ✅ This will be hidden in review mode -->
         <TextView
             android:id="@+id/textViewStatUserAnswer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Your answer: Paris"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:text="Bạn chọn: Paris" />
 
         <TextView
             android:id="@+id/textViewStatCorrectAnswer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Correct answer: Paris"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="4dp"
+            android:text="Câu trả lời đúng: Paris" />
 
     </LinearLayout>
 

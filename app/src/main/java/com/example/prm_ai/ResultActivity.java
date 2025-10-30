@@ -11,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.prm_ai.network.ApiClient;
 import com.example.prm_ai.network.GeminiApiRequest;
@@ -28,10 +27,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ResultActivity extends AppCompatActivity {
+public class ResultActivity extends BaseActivity {
 
     private TextView extractedTextView, summaryTextView;
-    private Button buttonTakeQuiz;
+    private Button buttonTakeQuiz, buttonTranslate;
     private ProgressBar progressBarSummary, progressBarExtractedText;
 
     private TextRecognizer recognizer;
@@ -43,6 +42,10 @@ public class ResultActivity extends AppCompatActivity {
     private long currentHistoryId = -1;
     private String currentPhotoPath;
 
+    private String originalSummaryCache;
+    private String translatedSummaryCache;
+    private boolean isShowingTranslated = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,7 @@ public class ResultActivity extends AppCompatActivity {
         extractedTextView = findViewById(R.id.extractedTextView);
         summaryTextView = findViewById(R.id.summaryTextView);
         buttonTakeQuiz = findViewById(R.id.buttonTakeQuiz);
+        buttonTranslate = findViewById(R.id.buttonTranslate);
         progressBarSummary = findViewById(R.id.progressBarSummary);
         progressBarExtractedText = findViewById(R.id.progressBarExtractedText);
 
@@ -78,6 +82,9 @@ public class ResultActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        buttonTranslate.setOnClickListener(v -> toggleSummaryTranslation());
+        buttonTranslate.setVisibility(View.GONE);
     }
 
     private void recognizeText(Bitmap bitmap) {
@@ -91,8 +98,7 @@ public class ResultActivity extends AppCompatActivity {
                     extractedTextView.setVisibility(View.VISIBLE);
                     String extractedText = visionText.getText();
                     extractedTextView.setText(extractedText);
-                    // ✅ Bắt đầu luồng xử lý mới: phát hiện ngôn ngữ rồi tóm tắt
-                    detectLanguageAndSummarize(extractedText);
+                    detectLanguageAndProcess(extractedText);
                 })
                 .addOnFailureListener(e -> {
                     progressBarExtractedText.setVisibility(View.GONE);
@@ -101,60 +107,112 @@ public class ResultActivity extends AppCompatActivity {
                 });
     }
 
-    private void detectLanguageAndSummarize(String text) {
+    private void detectLanguageAndProcess(String text) {
         if (text == null || text.trim().isEmpty()) {
             summaryTextView.setText("No text to summarize.");
             return;
         }
-        // Phát hiện ngôn ngữ của văn bản
         languageIdentifier.identifyLanguage(text)
                 .addOnSuccessListener(languageCode -> {
-                    if (languageCode.equals("und")) {
-                        languageCode = "en"; // Mặc định là tiếng Anh nếu không xác định được
-                    }
-                    // Yêu cầu tóm tắt bằng ngôn ngữ đã phát hiện
-                    summarizeInDetectedLanguage(text, languageCode);
+                    if (languageCode.equals("und")) languageCode = "en";
+                    summarizeAndTranslate(text, languageCode);
                 })
-                .addOnFailureListener(e -> {
-                    // Nếu lỗi, mặc định dùng tiếng Anh
-                    summarizeInDetectedLanguage(text, "en");
-                });
+                .addOnFailureListener(e -> summarizeAndTranslate(text, "en"));
     }
 
-    private void summarizeInDetectedLanguage(String text, String detectedLanguageCode) {
+    private void summarizeAndTranslate(String originalText, String detectedLanguageCode) {
         progressBarSummary.setVisibility(View.VISIBLE);
         summaryTextView.setVisibility(View.GONE);
 
-        // ✅ Sửa đổi prompt: Yêu cầu tóm tắt bằng ngôn ngữ gốc
-        String prompt = "Summarize the following text in its original language, which is '" + detectedLanguageCode + "':\n\n" + text;
-        GeminiApiRequest request = new GeminiApiRequest(prompt);
-
-        apiService.generateContent(BuildConfig.GEMINI_API_KEY, request).enqueue(new Callback<GeminiApiResponse>() {
+        String summaryPrompt = "Summarize the following text in its original language, which is '" + detectedLanguageCode + "':\n\n" + originalText;
+        makeApiCall(summaryPrompt, new Callback<GeminiApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
-                progressBarSummary.setVisibility(View.GONE);
-                summaryTextView.setVisibility(View.VISIBLE);
-
-                if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
-                    String summary = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    summaryTextView.setText(summary);
-
-                    if (userId != -1 && currentPhotoPath != null) {
-                        // ✅ Lưu lại lịch sử với mã ngôn ngữ đã phát hiện
-                        currentHistoryId = dbHelper.addScanHistory(userId, currentPhotoPath, text, summary, null, detectedLanguageCode);
-                    }
+                if (isSuccess(response)) {
+                    originalSummaryCache = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
+                    summaryTextView.setText(originalSummaryCache);
+                    progressBarSummary.setVisibility(View.GONE);
+                    summaryTextView.setVisibility(View.VISIBLE);
                     buttonTakeQuiz.setVisibility(View.VISIBLE);
+
+                    if (!detectedLanguageCode.equals("vi")) {
+                        // ✅ Hiển thị trạng thái đang dịch
+                        buttonTranslate.setVisibility(View.VISIBLE);
+                        buttonTranslate.setText(R.string.result_translating);
+                        buttonTranslate.setEnabled(false);
+                        translateSummaryAndSave(originalText, detectedLanguageCode);
+                    } else {
+                        saveHistory(originalText, originalSummaryCache, null, detectedLanguageCode);
+                    }
                 } else {
-                    summaryTextView.setText("Summarization failed.");
+                    handleApiFailure("Summarization failed.");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
-                progressBarSummary.setVisibility(View.GONE);
-                summaryTextView.setVisibility(View.VISIBLE);
-                summaryTextView.setText("Summarization failed: " + t.getMessage());
+                handleApiFailure(t.getMessage());
             }
         });
+    }
+
+    private void translateSummaryAndSave(String originalText, String detectedLanguageCode) {
+        String translatePrompt = "Translate the following text to Vietnamese:\n\n" + originalSummaryCache;
+        makeApiCall(translatePrompt, new Callback<GeminiApiResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
+                if (isSuccess(response)) {
+                    translatedSummaryCache = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
+                    // ✅ Kích hoạt nút dịch khi đã dịch xong
+                    buttonTranslate.setText(R.string.result_translate);
+                    buttonTranslate.setEnabled(true);
+                } else {
+                    // Ẩn nút nếu dịch thất bại
+                    buttonTranslate.setVisibility(View.GONE);
+                }
+                saveHistory(originalText, originalSummaryCache, translatedSummaryCache, detectedLanguageCode);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
+                buttonTranslate.setVisibility(View.GONE);
+                saveHistory(originalText, originalSummaryCache, null, detectedLanguageCode);
+            }
+        });
+    }
+
+    private void saveHistory(String originalText, String originalSummary, String translatedSummary, String detectedLanguage) {
+        if (userId != -1 && currentPhotoPath != null) {
+            currentHistoryId = dbHelper.addScanHistory(userId, currentPhotoPath, originalText, originalSummary, translatedSummary, detectedLanguage);
+        }
+    }
+
+    private void toggleSummaryTranslation() {
+        if (isShowingTranslated) {
+            summaryTextView.setText(originalSummaryCache);
+            buttonTranslate.setText(R.string.result_translate);
+            isShowingTranslated = false;
+        } else {
+            if (translatedSummaryCache != null && !translatedSummaryCache.isEmpty()) {
+                summaryTextView.setText(translatedSummaryCache);
+                buttonTranslate.setText(R.string.result_view_original);
+                isShowingTranslated = true;
+            }
+        }
+    }
+
+    private void makeApiCall(String prompt, Callback<GeminiApiResponse> callback) {
+        GeminiApiRequest request = new GeminiApiRequest(prompt);
+        apiService.generateContent(BuildConfig.GEMINI_API_KEY, request).enqueue(callback);
+    }
+
+    private boolean isSuccess(Response<GeminiApiResponse> response) {
+        return response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty();
+    }
+
+    private void handleApiFailure(String message) {
+        progressBarSummary.setVisibility(View.GONE);
+        summaryTextView.setVisibility(View.VISIBLE);
+        summaryTextView.setText(message);
     }
 }

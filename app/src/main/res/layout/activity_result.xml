@@ -14,9 +14,10 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/extractedTextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Văn bản trích xuất"
+            android:text="@string/result_extracted_text_title"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
@@ -54,14 +55,33 @@
 
         </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AI Tóm tắt"
-            android:textSize="20sp"
-            android:textStyle="bold"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/summaryTitle"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/result_summary_title"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/buttonTranslate"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/result_translate"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+        </LinearLayout>
 
         <!-- Khu vực tóm tắt với ProgressBar -->
         <androidx.cardview.widget.CardView
@@ -101,7 +121,7 @@
             android:id="@+id/buttonTakeQuiz"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Làm Quiz"
+            android:text="@string/result_take_quiz"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:visibility="gone" 

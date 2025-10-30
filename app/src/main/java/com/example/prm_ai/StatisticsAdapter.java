@@ -35,13 +35,13 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.Vi
         QuizQuestion question = item.getQuestion();
         String userAnswer = item.getUserAnswer();
 
-        holder.questionText.setText("Question: " + question.getQuestion());
-        holder.correctAnswerText.setText("Correct answer: " + question.getAnswer());
+        holder.questionText.setText("Câu hỏi: " + question.getQuestion());
+        holder.correctAnswerText.setText("Câu trả lời đúng: " + question.getAnswer());
 
         // ✅ Chế độ xem lại hoặc thống kê
         if (userAnswer != null && !userAnswer.isEmpty()) {
             holder.userAnswerText.setVisibility(View.VISIBLE);
-            holder.userAnswerText.setText("Your answer: " + userAnswer);
+            holder.userAnswerText.setText("Câu trả lời bạn: " + userAnswer);
 
             if (userAnswer.equals(question.getAnswer())) {
                 holder.userAnswerText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark));

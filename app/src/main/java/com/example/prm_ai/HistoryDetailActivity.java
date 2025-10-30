@@ -3,13 +3,12 @@ package com.example.prm_ai;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -21,16 +20,17 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistoryDetailActivity extends AppCompatActivity {
+public class HistoryDetailActivity extends BaseActivity {
 
     private ImageView imageViewDetail;
-    private TextView textViewSummaryDetail, textViewScoreDetail;
+    private TextView textViewSummaryDetail, textViewScoreDetail, textViewTranslatedSummaryTitle, textViewTranslatedSummaryDetail;
     private Button buttonStartQuizDetail, buttonReviewQuiz;
 
     private DatabaseHelper dbHelper;
     private long historyId;
     private String quizJsonCache;
-    private String userAnswersJsonCache; // Cache the user answers JSON
+    private String userAnswersJsonCache;
+    private List<QuizQuestion> questionsCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
 
         historyId = getIntent().getLongExtra("HISTORY_ID", -1);
         if (historyId == -1) {
-            Toast.makeText(this, "Error: History item not found.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error: History ID not found.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -51,6 +51,8 @@ public class HistoryDetailActivity extends AppCompatActivity {
         textViewScoreDetail = findViewById(R.id.textViewScoreDetail);
         buttonStartQuizDetail = findViewById(R.id.buttonStartQuizDetail);
         buttonReviewQuiz = findViewById(R.id.buttonReviewQuiz);
+        textViewTranslatedSummaryTitle = findViewById(R.id.textViewTranslatedSummaryTitle);
+        textViewTranslatedSummaryDetail = findViewById(R.id.textViewTranslatedSummaryDetail);
 
         buttonStartQuizDetail.setOnClickListener(v -> {
             Intent intent = new Intent(HistoryDetailActivity.this, QuizActivity.class);
@@ -59,27 +61,15 @@ public class HistoryDetailActivity extends AppCompatActivity {
         });
 
         buttonReviewQuiz.setOnClickListener(v -> {
-            if (quizJsonCache != null && !quizJsonCache.isEmpty()) {
-                try {
-                    QuizResponse quizResponse = new Gson().fromJson(quizJsonCache, QuizResponse.class);
-                    if (quizResponse != null && quizResponse.getQuestions() != null) {
-                        Intent intent = new Intent(HistoryDetailActivity.this, StatisticsActivity.class);
-                        intent.putExtra("QUESTIONS", (Serializable) quizResponse.getQuestions());
+            if (questionsCache != null && userAnswersJsonCache != null) {
+                Intent intent = new Intent(HistoryDetailActivity.this, StatisticsActivity.class);
+                intent.putExtra("QUESTIONS", (Serializable) questionsCache);
+                
+                Type listType = new TypeToken<ArrayList<String>>() {}.getType();
+                ArrayList<String> userAnswers = new Gson().fromJson(userAnswersJsonCache, listType);
 
-                        // Pass the saved user answers to the statistics activity
-                        if (userAnswersJsonCache != null) {
-                            Type type = new TypeToken<ArrayList<String>>() {}.getType();
-                            ArrayList<String> userAnswers = new Gson().fromJson(userAnswersJsonCache, type);
-                            intent.putStringArrayListExtra("USER_ANSWERS", userAnswers);
-                        }
-                        
-                        startActivity(intent);
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(this, "Could not parse quiz data.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "No quiz data available to review.", Toast.LENGTH_SHORT).show();
+                intent.putStringArrayListExtra("USER_ANSWERS", userAnswers);
+                startActivity(intent);
             }
         });
     }
@@ -95,46 +85,53 @@ public class HistoryDetailActivity extends AppCompatActivity {
         if (cursor != null && cursor.moveToFirst()) {
             String imagePath = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_IMAGE_PATH));
             String summary = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SUMMARY_TEXT));
+            String translatedSummary = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TRANSLATED_SUMMARY));
             quizJsonCache = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_JSON));
-            userAnswersJsonCache = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LAST_USER_ANSWERS_JSON)); // Load the answers
-            
+            userAnswersJsonCache = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LAST_USER_ANSWERS_JSON));
             String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIMESTAMP));
-            setTitle("Details from " + timestamp);
-            
+
+            setTitle(getString(R.string.history_title) + " - " + timestamp);
+
             textViewSummaryDetail.setText(summary);
+
+            if (!TextUtils.isEmpty(translatedSummary)) {
+                textViewTranslatedSummaryTitle.setVisibility(View.VISIBLE);
+                textViewTranslatedSummaryDetail.setVisibility(View.VISIBLE);
+                textViewTranslatedSummaryDetail.setText(translatedSummary);
+            } else {
+                textViewTranslatedSummaryTitle.setVisibility(View.GONE);
+                textViewTranslatedSummaryDetail.setVisibility(View.GONE);
+            }
+
+            questionsCache = parseQuestions(quizJsonCache);
 
             if (!cursor.isNull(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_SCORE))) {
                 int score = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUIZ_SCORE));
-                int totalQuestions = getTotalQuestionsFromJson(quizJsonCache);
+                int totalQuestions = questionsCache != null ? questionsCache.size() : 0;
                 textViewScoreDetail.setText(score + "/" + totalQuestions);
             } else {
-                textViewScoreDetail.setText("Chưa làm");
+                textViewScoreDetail.setText(getString(R.string.history_detail_not_taken));
             }
 
-            // Show the review button if there are saved answers
-            if (userAnswersJsonCache != null && !userAnswersJsonCache.isEmpty()) {
-                buttonReviewQuiz.setVisibility(View.VISIBLE);
-            } else {
-                buttonReviewQuiz.setVisibility(View.GONE);
-            }
+            buttonReviewQuiz.setVisibility(userAnswersJsonCache != null ? View.VISIBLE : View.GONE);
 
             Glide.with(this).load(new File(imagePath)).into(imageViewDetail);
             cursor.close();
-        } else {
-            Toast.makeText(this, "Could not load history details.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private int getTotalQuestionsFromJson(String json) {
-        if (json == null || json.isEmpty()) return 0;
+    // ✅ Sửa lại logic parse JSON để đọc đúng cấu trúc
+    private List<QuizQuestion> parseQuestions(String json) {
+        if (json == null) return new ArrayList<>();
         try {
-            QuizResponse response = new Gson().fromJson(json, QuizResponse.class);
+            // Sử dụng một lớp nội bộ tương tự như trong QuizActivity để Gson có thể hiểu
+            QuizActivity.QuizResponse response = new Gson().fromJson(json, QuizActivity.QuizResponse.class);
             if (response != null && response.getQuestions() != null) {
-                 return response.getQuestions().size();
+                return response.getQuestions();
             }
-            return 0;
         } catch (Exception e) {
-            return 0;
+            // Log lỗi hoặc xử lý nếu cần
         }
+        return new ArrayList<>();
     }
 }

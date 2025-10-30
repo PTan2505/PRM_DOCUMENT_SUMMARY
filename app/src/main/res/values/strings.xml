@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">PRM_AI</string>
+
+    <!-- General -->
+    <string name="result_extracted_text_title">Văn bản trích xuất</string>
+    <string name="result_summary_title">AI Tóm tắt</string>
+    <string name="result_take_quiz">Làm Quiz</string>
+    <string name="result_translate">Dịch sang tiếng Việt</string>
+    <string name="result_view_original">Ngôn ngữ gốc</string>
+    <string name="result_translating">Đang dịch...</string>
+
+    <!-- History -->
+    <string name="history_title">Lịch sử</string>
+    <string name="history_detail_summary_title">Tóm tắt ngôn ngữ gốc</string>
+    <string name="history_detail_translated_summary_title">Tóm tắt tiếng Việt</string>
+    <string name="history_detail_last_score">Kết quả cuối:</string>
+    <string name="history_detail_review">Chi tiết</string>
+    <string name="history_detail_retake">Làm lại</string>
+    <string name="history_detail_not_taken">Chưa làm</string>
+
+    <!-- Quiz -->
+    <string name="quiz_question_title">Câu hỏi %1$d/%2$d</string>
+    <string name="quiz_submit">Nộp</string>
+    <string name="quiz_next">Tiếp</string>
+    <string name="quiz_finish">Hoàn thành</string>
+    <string name="quiz_please_select_answer">Vui lòng chọn câu trả lời.</string>
+
 </resources>
