@@ -13,6 +13,50 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Image Labels Section -->
+        <TextView
+            android:id="@+id/imageLabelsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phân loại văn bản"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp">
+
+                <ProgressBar
+                    android:id="@+id/progressBarImageLabels"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+                <TextView
+                    android:id="@+id/imageLabelsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    tools:text="Document (95%)\nText (90%)\nPaper (85%)"
+                    tools:visibility="visible" />
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Extracted Text Section -->
         <TextView
             android:id="@+id/extractedTextTitle"
             android:layout_width="wrap_content"
@@ -20,9 +64,9 @@
             android:text="@string/result_extracted_text_title"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"/>
 
-        <!-- ✅ Khu vực trích xuất văn bản với ProgressBar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,6 +99,7 @@
 
         </androidx.cardview.widget.CardView>
 
+        <!-- Summary Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -83,7 +128,6 @@
 
         </LinearLayout>
 
-        <!-- Khu vực tóm tắt với ProgressBar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -124,7 +168,7 @@
             android:text="@string/result_take_quiz"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:visibility="gone" 
+            android:visibility="gone"
             tools:visibility="visible"/>
 
     </LinearLayout>

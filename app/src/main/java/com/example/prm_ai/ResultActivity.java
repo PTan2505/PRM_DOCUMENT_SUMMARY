@@ -22,6 +22,12 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,11 +35,12 @@ import retrofit2.Response;
 
 public class ResultActivity extends BaseActivity {
 
-    private TextView extractedTextView, summaryTextView;
+    private TextView extractedTextView, summaryTextView, imageLabelsTextView;
     private Button buttonTakeQuiz, buttonTranslate;
-    private ProgressBar progressBarSummary, progressBarExtractedText;
+    private ProgressBar progressBarSummary, progressBarExtractedText, progressBarImageLabels;
 
     private TextRecognizer recognizer;
+    private ImageLabeler imageLabeler;
     private GeminiApiService apiService;
     private DatabaseHelper dbHelper;
     private LanguageIdentifier languageIdentifier;
@@ -53,13 +60,16 @@ public class ResultActivity extends BaseActivity {
 
         extractedTextView = findViewById(R.id.extractedTextView);
         summaryTextView = findViewById(R.id.summaryTextView);
+        imageLabelsTextView = findViewById(R.id.imageLabelsTextView);
         buttonTakeQuiz = findViewById(R.id.buttonTakeQuiz);
         buttonTranslate = findViewById(R.id.buttonTranslate);
         progressBarSummary = findViewById(R.id.progressBarSummary);
         progressBarExtractedText = findViewById(R.id.progressBarExtractedText);
+        progressBarImageLabels = findViewById(R.id.progressBarImageLabels);
 
         dbHelper = new DatabaseHelper(this);
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        imageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
         apiService = ApiClient.getClient().create(GeminiApiService.class);
         languageIdentifier = LanguageIdentification.getClient();
 
@@ -70,6 +80,7 @@ public class ResultActivity extends BaseActivity {
             Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
             if (imageBitmap != null) {
                 recognizeText(imageBitmap);
+                labelImage(imageBitmap);
             }
         } else {
             Toast.makeText(this, "Error: Photo not found.", Toast.LENGTH_SHORT).show();
@@ -85,6 +96,36 @@ public class ResultActivity extends BaseActivity {
 
         buttonTranslate.setOnClickListener(v -> toggleSummaryTranslation());
         buttonTranslate.setVisibility(View.GONE);
+    }
+
+    private void labelImage(Bitmap bitmap) {
+        progressBarImageLabels.setVisibility(View.VISIBLE);
+        imageLabelsTextView.setVisibility(View.GONE);
+
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
+        imageLabeler.process(image)
+                .addOnSuccessListener(labels -> {
+                    progressBarImageLabels.setVisibility(View.GONE);
+                    imageLabelsTextView.setVisibility(View.VISIBLE);
+
+                    StringBuilder labelsText = new StringBuilder();
+                    for (ImageLabel label : labels) {
+                        String text = label.getText();
+                        float confidence = label.getConfidence();
+                        labelsText.append(String.format("%s (%.0f%%)\n", text, confidence * 100));
+                    }
+
+                    if (labelsText.length() > 0) {
+                        imageLabelsTextView.setText(labelsText.toString().trim());
+                    } else {
+                        imageLabelsTextView.setText("No labels detected");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    progressBarImageLabels.setVisibility(View.GONE);
+                    imageLabelsTextView.setVisibility(View.VISIBLE);
+                    imageLabelsTextView.setText("Image labeling failed: " + e.getMessage());
+                });
     }
 
     private void recognizeText(Bitmap bitmap) {
@@ -136,7 +177,6 @@ public class ResultActivity extends BaseActivity {
                     buttonTakeQuiz.setVisibility(View.VISIBLE);
 
                     if (!detectedLanguageCode.equals("vi")) {
-                        // ✅ Hiển thị trạng thái đang dịch
                         buttonTranslate.setVisibility(View.VISIBLE);
                         buttonTranslate.setText(R.string.result_translating);
                         buttonTranslate.setEnabled(false);
@@ -163,11 +203,9 @@ public class ResultActivity extends BaseActivity {
             public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
                 if (isSuccess(response)) {
                     translatedSummaryCache = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    // ✅ Kích hoạt nút dịch khi đã dịch xong
                     buttonTranslate.setText(R.string.result_translate);
                     buttonTranslate.setEnabled(true);
                 } else {
-                    // Ẩn nút nếu dịch thất bại
                     buttonTranslate.setVisibility(View.GONE);
                 }
                 saveHistory(originalText, originalSummaryCache, translatedSummaryCache, detectedLanguageCode);
