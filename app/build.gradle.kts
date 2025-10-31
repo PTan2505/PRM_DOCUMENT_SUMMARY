@@ -1,6 +1,18 @@
+// 1. CÁC DÒNG IMPORT
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+// 2. Tải tệp local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
 
 android {
     namespace = "com.example.prm_ai"
@@ -14,6 +26,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 3. Đọc key và tạo biến BuildConfig
+        val apiKey = localProperties.getProperty("GEMINI_API_KEY") ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -28,6 +44,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    // 4. THÊM DÒNG NÀY ĐỂ BẬT LẠI TÍNH NĂNG BUILDCONFIG
+    buildFeatures {
+        buildConfig = true
     }
 }
 

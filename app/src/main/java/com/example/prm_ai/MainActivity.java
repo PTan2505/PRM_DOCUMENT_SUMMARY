@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout; // Đổi từ View thành LinearLayout để rõ ràng
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale; // Thêm Locale để định dạng ngày
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private Button extractButton;
+    private Button captureButton; // Thêm
+    private LinearLayout emptyStateLayout; // Thêm
     private String currentPhotoPath;
 
     @Override
@@ -42,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.imageView);
         extractButton = findViewById(R.id.extractButton);
+        captureButton = findViewById(R.id.captureButton); // Thêm
+        emptyStateLayout = findViewById(R.id.emptyStateLayout); // Thêm
 
-        Button captureButton = findViewById(R.id.captureButton);
+        // Sửa lại click listener (từ tệp gốc của bạn)
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,12 +112,16 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
             imageView.setImageBitmap(imageBitmap);
+
+            // --- CẬP NHẬT UI ---
             extractButton.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE); // Ẩn trạng thái trống
+            captureButton.setText("Chụp lại"); // Đổi văn bản nút
         }
     }
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
