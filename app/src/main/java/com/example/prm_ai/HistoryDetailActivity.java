@@ -19,6 +19,9 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
+
 
 public class HistoryDetailActivity extends BaseActivity {
 
@@ -36,6 +39,15 @@ public class HistoryDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
+
+        Toolbar toolbar = findViewById(R.id.toolbarHistoryDetail);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+
 
         historyId = getIntent().getLongExtra("HISTORY_ID", -1);
         if (historyId == -1) {
@@ -133,5 +145,13 @@ public class HistoryDetailActivity extends BaseActivity {
             // Log lỗi hoặc xử lý nếu cần
         }
         return new ArrayList<>();
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

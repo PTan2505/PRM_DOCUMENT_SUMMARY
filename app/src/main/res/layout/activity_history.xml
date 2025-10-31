@@ -1,25 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+Thay đổi 1: Dùng LinearLayout làm gốc
+để chứa cả Toolbar và nội dung bên dưới
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:orientation="vertical"
     tools:context=".HistoryActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewHistory"
+    <!--
+    Thay đổi 2: Thêm Toolbar để chứa nút "Back"
+    Mình dùng màu đỏ #CC1414 cho đồng bộ
+    -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="4dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarHistory"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#CC1414"
+            app:title="Lịch sử Quét"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!--
+    Thay đổi 3: Dùng ConstraintLayout thay cho RelativeLayout
+    để căn giữa "No History" đẹp hơn.
+    Nền #F0F4F8 được giữ nguyên.
+    -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp" />
+        android:background="#F0F4F8">
 
-    <TextView
-        android:id="@+id/textViewNoHistory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No scan history found."
-        android:textSize="18sp"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewHistory"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+        <!--
+        Thay đổi 4: Cải thiện giao diện "No History"
+        - Thêm icon (drawableTop)
+        - Cho màu chữ xám hơn
+        -->
+        <TextView
+            android:id="@+id/textViewNoHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@android:drawable/ic_menu_info_details"
+            android:drawablePadding="16dp"
+            android:gravity="center_horizontal"
+            android:text="No scan history found."
+            android:textColor="#888888"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

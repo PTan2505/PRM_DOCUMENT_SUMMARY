@@ -45,10 +45,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         if (item.getQuizScore() != null) {
             // Cần lấy tổng số câu hỏi từ JSON để hiển thị chính xác
             int totalQuestions = getTotalQuestionsFromJson(item.getQuizJson());
-            holder.score.setText("Score: " + item.getQuizScore() + "/" + totalQuestions);
+            holder.score.setText("Điểm: " + item.getQuizScore() + "/" + totalQuestions);
             holder.score.setVisibility(View.VISIBLE);
         } else {
-            holder.score.setText("Score: Not taken");
+            holder.score.setText("Điểm: Chưa làm");
             holder.score.setVisibility(View.VISIBLE);
         }
 

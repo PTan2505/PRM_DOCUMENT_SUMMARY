@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
 public class HistoryActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewHistory;
@@ -24,6 +25,16 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+
+        Toolbar toolbar = findViewById(R.id.toolbarHistory);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+
 
         dbHelper = new DatabaseHelper(this);
         userId = getIntent().getIntExtra("USER_ID", -1);
@@ -80,5 +91,13 @@ public class HistoryActivity extends AppCompatActivity {
             textViewNoHistory.setVisibility(View.VISIBLE);
             recyclerViewHistory.setVisibility(View.GONE);
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
