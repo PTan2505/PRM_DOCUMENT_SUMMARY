@@ -32,7 +32,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
 public class ResultActivity extends BaseActivity {
 
     private TextView extractedTextView, summaryTextView, imageLabelsTextView;
@@ -57,6 +58,14 @@ public class ResultActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+
+        Toolbar toolbar = findViewById(R.id.toolbarResult);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
 
         extractedTextView = findViewById(R.id.extractedTextView);
         summaryTextView = findViewById(R.id.summaryTextView);
@@ -252,5 +261,15 @@ public class ResultActivity extends BaseActivity {
         progressBarSummary.setVisibility(View.GONE);
         summaryTextView.setVisibility(View.VISIBLE);
         summaryTextView.setText(message);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Kiểm tra xem ID có phải là nút "Home" (mũi tên back) không
+        if (item.getItemId() == android.R.id.home) {
+            // Quay về trang trước
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

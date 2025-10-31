@@ -5,13 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
+    android:background="#F5F7FA"
+
     tools:context=".StatisticsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarStatistics"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="#CC1414"
         app:title="Chi tiết Quiz"
         app:titleTextColor="@android:color/white" />
 
