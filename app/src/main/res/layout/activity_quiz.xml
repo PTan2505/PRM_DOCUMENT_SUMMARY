@@ -1,111 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:orientation="vertical"
     tools:context=".QuizActivity">
 
-    <RelativeLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:elevation="4dp">
 
-        <ProgressBar
-            android:id="@+id/progressBarQuiz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
-
-        <!-- Nhóm các câu hỏi -->
-        <LinearLayout
-            android:id="@+id/quizContainer"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarQuiz"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:layout_height="?attr/actionBarSize"
+            android:background="#CC1414"
+            app:title="Bài Kiểm Tra"
+            app:titleTextColor="@android:color/white" />
 
-            <TextView
-                android:id="@+id/textViewQuestionNumber"
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0F4F8"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp">
+
+            <ProgressBar
+                android:id="@+id/progressBarQuiz"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                tools:text="Question 1/10" />
-
-            <TextView
-                android:id="@+id/textViewQuestion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="What is the capital of France?" />
-
-            <RadioGroup
-                android:id="@+id/radioGroupOptions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp" />
-
-            <Button
-                android:id="@+id/buttonSubmitQuiz"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="24dp"
-                android:text="Nộp" />
-        </LinearLayout>
-
-        <!-- Kết quả -->
-        <LinearLayout
-            android:id="@+id/scoreContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Kết quả:"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/textViewScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="48sp"
-                android:textStyle="bold"
-                tools:text="8/10" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="gone"/>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/quizContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="20dp">
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
 
-                <!-- ✅ Nút Thống kê -->
-                <Button
-                    android:id="@+id/buttonStatistics"
+                <TextView
+                    android:id="@+id/textViewQuestionNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="Chi tiết" />
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="20sp"
+                    tools:text="Question 1/10" />
 
-                <Button
-                    android:id="@+id/buttonFinishQuiz"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/textViewQuestion"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hoàn thành"
-                    android:layout_marginStart="8dp"/>
+                    android:layout_marginTop="16dp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    tools:text="What is the capital of France?" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroupOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonSubmitQuiz"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="#CC1414"
+                    android:text="Nộp"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp" />
             </LinearLayout>
 
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/scoreContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="gone">
 
-    </RelativeLayout>
-</ScrollView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kết quả:"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/textViewScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="56sp"
+                    android:textStyle="bold"
+                    tools:text="8/10" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonStatistics"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="Chi tiết" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonFinishQuiz"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#CC1414"
+                        android:text="Hoàn thành" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

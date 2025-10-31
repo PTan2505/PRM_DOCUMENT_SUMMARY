@@ -27,6 +27,9 @@ import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -54,6 +57,16 @@ public class QuizActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+
+
+        Toolbar toolbar = findViewById(R.id.toolbarQuiz);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+
 
         progressBarQuiz = findViewById(R.id.progressBarQuiz);
         quizContainer = findViewById(R.id.quizContainer);
@@ -281,5 +294,14 @@ public class QuizActivity extends BaseActivity {
     static class QuizResponse {
         private List<QuizQuestion> questions;
         public List<QuizQuestion> getQuestions() { return questions; }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Xử lý khi nhấn nút "home" (mũi tên back)
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed(); // Quay về màn hình trước
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
