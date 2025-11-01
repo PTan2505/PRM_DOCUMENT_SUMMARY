@@ -245,14 +245,22 @@ public class QuizActivity extends BaseActivity {
             userAnswers.add(selectedAnswer);
             String correctAnswer = questions.get(currentQuestionIndex).getAnswer();
 
-            if (selectedAnswer.equals(correctAnswer)) {
+            // ✅ FIX: So sánh đúng giữa text đáp án và correctAnswer
+            boolean isCorrect = isAnswerCorrect(selectedAnswer, correctAnswer);
+
+            // 🔍 DEBUG: Log để kiểm tra
+            android.util.Log.d("QuizActivity", "Selected: '" + selectedAnswer + "' | Correct: '" + correctAnswer + "' | Result: " + isCorrect);
+
+            if (isCorrect) {
                 score++;
+                android.util.Log.d("QuizActivity", "Score increased to: " + score);
                 selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
             } else {
                 selectedRadioButton.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
+                // Highlight đáp án đúng
                 for (int i = 0; i < radioGroupOptions.getChildCount(); i++) {
                     RadioButton button = (RadioButton) radioGroupOptions.getChildAt(i);
-                    if (button.getText().toString().equals(correctAnswer)) {
+                    if (isAnswerCorrect(button.getText().toString(), correctAnswer)) {
                         button.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
                         break;
                     }
@@ -276,7 +284,59 @@ public class QuizActivity extends BaseActivity {
         }
     }
 
+    /**
+     * ✅ So sánh đáp án chính xác
+     * Hỗ trợ cả format "A. Paris" và "A" hoặc "Paris"
+     */
+    private boolean isAnswerCorrect(String userAnswer, String correctAnswer) {
+        if (userAnswer == null || correctAnswer == null) {
+            android.util.Log.d("QuizActivity", "isAnswerCorrect: null input");
+            return false;
+        }
+
+        // Loại bỏ khoảng trắng thừa
+        String user = userAnswer.trim();
+        String correct = correctAnswer.trim();
+
+        android.util.Log.d("QuizActivity", "isAnswerCorrect - Comparing: '" + user + "' vs '" + correct + "'");
+
+        // So sánh trực tiếp
+        if (user.equals(correct)) {
+            android.util.Log.d("QuizActivity", "isAnswerCorrect: Direct match!");
+            return true;
+        }
+
+        // ✅ CASE 1: userAnswer = "B. Trái Đất", correctAnswer = "B"
+        // Extract chữ cái đầu tiên từ userAnswer
+        if (user.length() >= 1) {
+            String firstChar = user.substring(0, 1);
+
+            // Nếu correctAnswer là 1 chữ cái (A, B, C, D)
+            if (correct.length() == 1 && firstChar.equals(correct)) {
+                // Kiểm tra format "X." hoặc "X. "
+                if (user.length() == 1 || (user.length() > 1 && (user.charAt(1) == '.' || user.charAt(1) == ' '))) {
+                    android.util.Log.d("QuizActivity", "isAnswerCorrect: Match by first letter '" + firstChar + "'");
+                    return true;
+                }
+            }
+        }
+
+        // ✅ CASE 2: correctAnswer có thể là full text
+        // Nếu user có format "A. Text", so sánh phần "Text" với correctAnswer
+        if (user.contains(". ")) {
+            String textPart = user.substring(user.indexOf(". ") + 2).trim();
+            if (textPart.equals(correct)) {
+                android.util.Log.d("QuizActivity", "isAnswerCorrect: Match by text part '" + textPart + "'");
+                return true;
+            }
+        }
+
+        android.util.Log.d("QuizActivity", "isAnswerCorrect: No match found");
+        return false;
+    }
+
     private void showFinalScore() {
+        android.util.Log.d("QuizActivity", "Final Score: " + score + "/" + questions.size());
         quizContainer.setVisibility(View.GONE);
         scoreContainer.setVisibility(View.VISIBLE);
         textViewScore.setText(score + "/" + questions.size());
