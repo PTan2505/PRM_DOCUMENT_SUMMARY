@@ -128,23 +128,13 @@ public class QuizActivity extends BaseActivity {
     }
 
     private void generateQuizInVietnamese(String text) {
-        // ✅ OPTIMIZATION 1: Giới hạn độ dài text (API xử lý nhanh hơn với text ngắn)
-        String truncatedText = text.length() > 1500 ? text.substring(0, 1500) + "..." : text;
-
-        // ✅ OPTIMIZATION 2: Giảm số câu hỏi từ 10 → 5 (giảm 50% thời gian xử lý)
-        // ✅ OPTIMIZATION 3: Prompt ngắn gọn, rõ ràng hơn
-        String prompt = "Tạo 5 câu hỏi trắc nghiệm từ văn bản sau.\n\n" +
-                "Format JSON (không có markdown, không có text thừa):\n" +
-                "{\n" +
-                "  \"questions\": [\n" +
-                "    {\n" +
-                "      \"question\": \"Câu hỏi?\",\n" +
-                "      \"options\": [\"A\", \"B\", \"C\", \"D\"],\n" +
-                "      \"answer\": \"A\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}\n\n" +
-                "Văn bản:\n" + truncatedText;
+        String prompt = "Dựa trên văn bản sau, hãy tạo 10 câu hỏi trắc nghiệm. " +
+                "YÊU CẦU QUAN TRỌNG: Chỉ trả về một đối tượng JSON sạch, không có markdown hay bất kỳ văn bản nào khác. " +
+                "Cấu trúc JSON phải có một khóa gốc duy nhất là \"questions\". " +
+                "Giá trị của khóa \"questions\" phải là một mảng các đối tượng. " +
+                "Mỗi đối tượng phải có các khóa bằng Tiếng Anh: \"question\", \"options\" (mảng 4 chuỗi), và \"answer\". " +
+                "Nội dung (value) cho các khóa đó phải bằng Tiếng Việt. " +
+                "Văn bản: " + text;
 
         GeminiApiRequest request = new GeminiApiRequest(prompt);
 
@@ -153,9 +143,7 @@ public class QuizActivity extends BaseActivity {
             public void onResponse(@NonNull Call<GeminiApiResponse> call, @NonNull Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String jsonResponse = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-
-                    // ✅ OPTIMIZATION 4: Làm sạch JSON nhanh và đơn giản
-                    String cleanJson = cleanJsonResponse(jsonResponse);
+                    String cleanJson = jsonResponse.replaceAll("```json|```", "").trim();
 
                     dbHelper.updateQuizData(historyId, cleanJson);
                     parseQuizJson(cleanJson);
@@ -169,26 +157,6 @@ public class QuizActivity extends BaseActivity {
                 showError("Network error while generating quiz: " + t.getMessage());
             }
         });
-    }
-
-    /**
-     * ✅ OPTIMIZATION 5: Làm sạch JSON response nhanh
-     */
-    private String cleanJsonResponse(String response) {
-        // Loại bỏ markdown code blocks
-        String cleaned = response.replaceAll("```json\\s*", "")
-                .replaceAll("```\\s*", "")
-                .trim();
-
-        // Tìm JSON object
-        int jsonStart = cleaned.indexOf("{");
-        int jsonEnd = cleaned.lastIndexOf("}");
-
-        if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
-            cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-        }
-
-        return cleaned;
     }
 
     private void parseQuizJson(String json) {
