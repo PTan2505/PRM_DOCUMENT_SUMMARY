@@ -4,22 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="#F8F9FA"
     tools:context=".HistoryActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewHistory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:clipToPadding="false" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/textViewNoHistory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No scan history found."
-        android:textSize="18sp"
         android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📋"
+            android:textSize="64sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Chưa có lịch sử quét"
+            android:textSize="18sp"
+            android:textColor="#757575"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Hãy quét tài liệu đầu tiên!"
+            android:textSize="14sp"
+            android:textColor="#9E9E9E" />
+
+    </LinearLayout>
 
 </RelativeLayout>

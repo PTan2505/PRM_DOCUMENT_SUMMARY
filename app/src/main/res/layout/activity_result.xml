@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="#F8F9FA"
     tools:context=".ResultActivity">
 
     <LinearLayout
@@ -21,33 +21,38 @@
             android:text="Phân loại văn bản"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:textColor="#1A237E"
+            android:layout_marginBottom="12dp"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardUseCompatPadding="true"
+            app:cardBackgroundColor="#FFFFFF">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="100dp">
+                android:minHeight="100dp"
+                android:padding="16dp">
 
                 <ProgressBar
                     android:id="@+id/progressBarImageLabels"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
+                    android:layout_centerInParent="true"
+                    android:indeterminateTint="@android:color/holo_blue_dark" />
 
                 <TextView
                     android:id="@+id/imageLabelsTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
                     android:textSize="16sp"
+                    android:textColor="#424242"
+                    android:lineSpacingExtra="4dp"
                     android:visibility="gone"
                     tools:text="Document (95%)\nText (90%)\nPaper (85%)"
                     tools:visibility="visible" />
@@ -64,36 +69,42 @@
             android:text="@string/result_extracted_text_title"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:textColor="#1A237E"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="12dp"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardUseCompatPadding="true"
+            app:cardBackgroundColor="#FFFFFF">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="120dp">
+                android:minHeight="120dp"
+                android:padding="16dp">
 
                 <ProgressBar
                     android:id="@+id/progressBarExtractedText"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
+                    android:layout_centerInParent="true"
+                    android:indeterminateTint="@android:color/holo_blue_dark" />
 
                 <TextView
                     android:id="@+id/extractedTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
                     android:textSize="16sp"
+                    android:textColor="#424242"
+                    android:lineSpacingExtra="4dp"
                     android:visibility="gone"
-                    tools:visibility="visible" />
+                    tools:visibility="visible"
+                    tools:text="Đây là văn bản được trích xuất từ ảnh..." />
 
             </RelativeLayout>
 
@@ -106,7 +117,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:id="@+id/summaryTitle"
@@ -115,14 +126,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/result_summary_title"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="#1A237E" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonTranslate"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/result_translate"
+                android:textColor="@android:color/holo_blue_dark"
                 android:visibility="gone"
                 tools:visibility="visible"/>
 
@@ -131,28 +144,32 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardUseCompatPadding="true"
+            app:cardBackgroundColor="#FFFFFF">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="120dp">
+                android:minHeight="120dp"
+                android:padding="16dp">
 
                 <ProgressBar
                     android:id="@+id/progressBarSummary"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
+                    android:layout_centerInParent="true"
+                    android:indeterminateTint="@android:color/holo_blue_dark" />
 
                 <TextView
                     android:id="@+id/summaryTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
                     android:textSize="16sp"
+                    android:textColor="#424242"
+                    android:lineSpacingExtra="4dp"
                     android:visibility="gone"
                     tools:text="Đây là bản tóm tắt mẫu."
                     tools:visibility="visible" />
@@ -161,13 +178,18 @@
 
         </androidx.cardview.widget.CardView>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonTakeQuiz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
             android:text="@string/result_take_quiz"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:backgroundTint="@android:color/holo_purple"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
             android:visibility="gone"
             tools:visibility="visible"/>
 
