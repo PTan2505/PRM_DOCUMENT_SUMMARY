@@ -7,19 +7,68 @@
     android:background="#F0F4F8"
     tools:context=".HistoryActivity">
 
+    <!-- 1. Khôi phục lại Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayoutHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarHistory"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="Lịch sử"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewHistory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp" />
+        android:layout_below="@id/appBarLayoutHistory"
+        android:padding="8dp"
+        android:clipToPadding="false" /> <!-- Thêm clipToPadding -->
 
-    <TextView
+    <!-- 2. Cải thiện "Trạng thái trống" (Empty State) -->
+    <!-- Đặt ID là "textViewNoHistory" để khớp với HistoryActivity.java -->
+    <LinearLayout
         android:id="@+id/textViewNoHistory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No scan history found."
-        android:textSize="18sp"
+        android:orientation="vertical"
+        android:gravity="center"
         android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:alpha="0.7"> <!-- Làm cho nó tinh tế hơn -->
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_dialog_info"
+            android:contentDescription="Lịch sử trống"
+            app:tint="#546E7A" /> <!-- Đổi màu tint cho đẹp hơn -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Lịch sử trống"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#546E7A"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Các bản tóm tắt của bạn sẽ ở đây."
+            android:textSize="14sp"
+            android:textColor="#546E7A"/>
+    </LinearLayout>
 
 </RelativeLayout>
+

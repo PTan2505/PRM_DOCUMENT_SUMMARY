@@ -10,8 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/imageViewDetail"
@@ -20,95 +19,104 @@
             android:scaleType="centerCrop"
             tools:src="@mipmap/ic_launcher" />
 
-        <TextView
-            android:id="@+id/textViewSummaryTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/history_detail_summary_title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textViewSummaryDetail"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            tools:text="This is a summary of the scanned document." />
-
-        <TextView
-            android:id="@+id/textViewTranslatedSummaryTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/history_detail_translated_summary_title"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/textViewTranslatedSummaryDetail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:visibility="gone"
-            tools:text="This is the translated summary." 
-            tools:visibility="visible"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#DADADA"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <TextView
-                android:id="@+id/quizScoreLabel"
+                android:id="@+id/textViewSummaryTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:text="@string/history_detail_last_score"
-                android:textSize="18sp" />
+                android:text="@string/history_detail_summary_title"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textViewScoreDetail"
+                android:id="@+id/textViewSummaryDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                tools:text="This is a summary of the scanned document." />
+
+            <TextView
+                android:id="@+id/textViewTranslatedSummaryTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/quizScoreLabel"
-                android:layout_marginStart="8dp"
-                android:textSize="18sp"
+                android:layout_marginTop="16dp"
+                android:text="@string/history_detail_translated_summary_title"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                tools:text="8/10" />
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/textViewTranslatedSummaryDetail"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_alignParentEnd="true">
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:text="This is the translated summary."
+                tools:visibility="visible"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#DADADA"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/quizScoreLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/history_detail_last_score"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/textViewScoreDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/quizScoreLabel"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="8/10" />
+
+                <Button
+                    android:id="@+id/buttonStartQuizDetail"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/history_detail_retake"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <Button
                     android:id="@+id/buttonReviewQuiz"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/history_detail_review" />
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/history_detail_review"
+                    app:layout_constraintEnd_toStartOf="@+id/buttonStartQuizDetail"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <Button
-                    android:id="@+id/buttonStartQuizDetail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/history_detail_retake" />
-            </LinearLayout>
-
-        </RelativeLayout>
-
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

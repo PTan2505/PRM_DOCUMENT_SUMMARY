@@ -23,52 +23,101 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- ✅ Container cho các nút hành động -->
-    <LinearLayout
-        android:id="@+id/buttonContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
-
-        <Button
-            android:id="@+id/captureButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Chụp ảnh văn bản" />
-
-        <Button
-            android:id="@+id/selectFromGalleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Chọn ảnh từ thư viện" />
-
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/imageView"
+    <FrameLayout
+        android:id="@+id/imageContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonContainer" 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/extractButton"
         android:layout_margin="16dp"
-        android:contentDescription="Captured Image" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:layout_constraintBottom_toTopOf="@+id/extractButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Captured Image"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/placeholderContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            tools:visibility="gone">
+
+            <!-- SỬA LỖI: Thay thế @drawable/ic_image_placeholder bằng icon hệ thống -->
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                app:tint="#B0BEC5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Chụp hoặc chọn ảnh để bắt đầu"
+                android:textSize="16sp"
+                android:textColor="#546E7A"/>
+        </LinearLayout>
+
+    </FrameLayout>
 
     <Button
         android:id="@+id/extractButton"
-        android:layout_width="wrap_content"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Trích xuất văn bản"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:visibility="gone"/>
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/captureButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Chụp ảnh"
+            app:icon="@android:drawable/ic_menu_camera" /> <!-- SỬA LỖI: Thay thế @drawable/ic_camera -->
+
+        <Button
+            android:id="@+id/selectFromGalleryButton"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Chọn ảnh"
+            app:icon="@android:drawable/ic_menu_myplaces" /> <!-- SỬA LỖI: Thay thế @drawable/ic_gallery -->
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
