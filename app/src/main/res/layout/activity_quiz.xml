@@ -5,6 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
+    android:fitsSystemWindows="true"
+
     tools:context=".QuizActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -57,8 +60,11 @@
                     android:id="@+id/textViewQuestionNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="#888888"
                     android:textSize="20sp"
+
+                    android:textStyle="bold"
+
                     tools:text="Question 1/10" />
 
                 <TextView
@@ -66,7 +72,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="25sp"
                     android:textStyle="bold"
                     tools:text="What is the capital of France?" />
@@ -85,6 +91,9 @@
                     android:backgroundTint="#CC1414"
                     android:text="Nộp"
                     android:textSize="16sp"
+
+                    android:textColor="@android:color/white"
+
                     app:cornerRadius="12dp" />
             </LinearLayout>
 
@@ -105,14 +114,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Kết quả:"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="#888888"
                     android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/textViewScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="56sp"
                     android:textStyle="bold"
                     tools:text="8/10" />
@@ -129,7 +138,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:text="Chi tiết" />
+                        android:text="Chi tiết"
+                        android:textColor="@android:color/black" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonFinishQuiz"
@@ -137,7 +147,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:backgroundTint="#CC1414"
-                        android:text="Hoàn thành" />
+                        android:text="Hoàn thành"
+                        android:textColor="@android:color/white" />
                 </LinearLayout>
 
             </LinearLayout>

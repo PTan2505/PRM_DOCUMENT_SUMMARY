@@ -5,13 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
+    android:fitsSystemWindows="true"
+
     tools:context=".ResultActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp">
+        android:elevation="4dp"
+
+        >
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarResult"
@@ -41,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Phân loại văn bản"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="@android:color/black"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -54,7 +59,6 @@
                 app:cardElevation="2dp"
                 app:strokeColor="#E0E0E0"
                 app:strokeWidth="1dp">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -75,6 +79,7 @@
                         android:padding="16dp"
                         android:textSize="16sp"
                         android:visibility="gone"
+                        android:textColor="@android:color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -90,7 +95,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/result_extracted_text_title"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="@android:color/black"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -103,7 +108,6 @@
                 app:cardElevation="2dp"
                 app:strokeColor="#E0E0E0"
                 app:strokeWidth="1dp">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -124,6 +128,7 @@
                         android:padding="16dp"
                         android:textSize="16sp"
                         android:visibility="gone"
+                        android:textColor="@android:color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -144,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/result_summary_title"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="22sp"
                     android:textStyle="bold" />
                 <Button
@@ -153,6 +158,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/result_translate"
+                    android:textColor="#CC1414"
                     android:visibility="gone"
                     tools:visibility="visible" />
             </LinearLayout>
@@ -165,7 +171,6 @@
                 app:cardElevation="2dp"
                 app:strokeColor="#E0E0E0"
                 app:strokeWidth="1dp">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -186,6 +191,7 @@
                         android:padding="16dp"
                         android:textSize="16sp"
                         android:visibility="gone"
+                        android:textColor="@android:color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -201,6 +207,7 @@
                 android:layout_marginTop="24dp"
                 android:backgroundTint="#CC1414"
                 android:text="@string/result_take_quiz"
+                android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:visibility="gone"

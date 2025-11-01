@@ -6,6 +6,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F7FA"
+
+    android:fitsSystemWindows="true"
+
     tools:context=".HistoryDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -70,9 +73,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/history_detail_summary_title"
-                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+
+                        android:textColor="@android:color/black" />
 
                     <TextView
                         android:id="@+id/textViewSummaryDetail"
@@ -80,6 +84,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:textSize="16sp"
+
+                        android:textColor="@android:color/black"
+
                         tools:text="This is a summary of the scanned document." />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -108,10 +115,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/history_detail_translated_summary_title"
-                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+
+                        android:textColor="@android:color/black" />
 
                     <TextView
                         android:id="@+id/textViewTranslatedSummaryDetail"
@@ -120,6 +128,9 @@
                         android:layout_marginTop="8dp"
                         android:textSize="16sp"
                         android:visibility="visible"
+
+                        android:textColor="@android:color/black"
+
                         tools:text="This is the translated summary." />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -132,7 +143,6 @@
                 app:cardElevation="2dp"
                 app:strokeColor="#E0E0E0"
                 app:strokeWidth="1dp"
-
                 app:cardBackgroundColor="#F5F5F5">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -146,6 +156,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/history_detail_last_score"
                         android:textSize="18sp"
+                        android:textColor="@android:color/black"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -157,6 +168,7 @@
                         android:layout_marginStart="8dp"
                         android:textSize="18sp"
                         android:textStyle="bold"
+                        android:textColor="@android:color/black"
                         app:layout_constraintBottom_toBottomOf="@id/quizScoreLabel"
                         app:layout_constraintStart_toEndOf="@+id/quizScoreLabel"
                         app:layout_constraintTop_toTopOf="@id/quizScoreLabel"
@@ -167,8 +179,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/history_detail_retake"
-
                         android:backgroundTint="#CC1414"
+
+                        android:textColor="@android:color/white"
 
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -181,6 +194,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:text="@string/history_detail_review"
+
+                        android:textColor="@android:color/black"
+
                         app:layout_constraintBottom_toBottomOf="@id/buttonStartQuizDetail"
                         app:layout_constraintEnd_toStartOf="@id/buttonStartQuizDetail"
                         app:layout_constraintTop_toTopOf="@id/buttonStartQuizDetail" />

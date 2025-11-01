@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="Câu hỏi: What is the capital of France?"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -41,7 +41,7 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:text="Bạn chọn: Paris"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="#555555"
             android:textSize="14sp"
             app:drawableStartCompat="@android:drawable/ic_menu_edit"
             app:drawableTint="#1976D2" />
@@ -54,7 +54,7 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:text="Câu trả lời đúng: Paris"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="#555555"
             android:textSize="14sp"
             app:drawableStartCompat="@android:drawable/ic_menu_save"
             app:drawableTint="#388E3C" />

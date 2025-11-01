@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-Thay đổi 1: Dùng LinearLayout làm gốc
-để chứa cả Toolbar và nội dung bên dưới
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
+    android:fitsSystemWindows="true"
+
     tools:context=".HistoryActivity">
 
-    <!--
-    Thay đổi 2: Thêm Toolbar để chứa nút "Back"
-    Mình dùng màu đỏ #CC1414 cho đồng bộ
-    -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -31,11 +26,6 @@ Thay đổi 1: Dùng LinearLayout làm gốc
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!--
-    Thay đổi 3: Dùng ConstraintLayout thay cho RelativeLayout
-    để căn giữa "No History" đẹp hơn.
-    Nền #F0F4F8 được giữ nguyên.
-    -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -51,11 +41,6 @@ Thay đổi 1: Dùng LinearLayout làm gốc
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!--
-        Thay đổi 4: Cải thiện giao diện "No History"
-        - Thêm icon (drawableTop)
-        - Cho màu chữ xám hơn
-        -->
         <TextView
             android:id="@+id/textViewNoHistory"
             android:layout_width="wrap_content"
