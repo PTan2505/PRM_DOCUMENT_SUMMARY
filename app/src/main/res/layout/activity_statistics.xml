@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#F0F4F8"
     tools:context=".StatisticsActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -19,6 +20,7 @@
         android:id="@+id/recyclerViewStatistics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
 </LinearLayout>

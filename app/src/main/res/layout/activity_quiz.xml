@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="#F0F4F8"
     tools:context=".QuizActivity">
 
     <RelativeLayout
@@ -18,7 +19,6 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
 
-        <!-- Nhóm các câu hỏi -->
         <LinearLayout
             android:id="@+id/quizContainer"
             android:layout_width="match_parent"
@@ -32,7 +32,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                tools:text="Question 1/10" />
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold"
+                tools:text="Question 1/5" />
 
             <TextView
                 android:id="@+id/textViewQuestion"
@@ -41,6 +43,7 @@
                 android:layout_marginTop="16dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:textColor="#333333"
                 tools:text="What is the capital of France?" />
 
             <RadioGroup
@@ -51,6 +54,7 @@
 
             <Button
                 android:id="@+id/buttonSubmitQuiz"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -58,7 +62,6 @@
                 android:text="Nộp" />
         </LinearLayout>
 
-        <!-- Kết quả -->
         <LinearLayout
             android:id="@+id/scoreContainer"
             android:layout_width="wrap_content"
@@ -81,7 +84,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="48sp"
                 android:textStyle="bold"
-                tools:text="8/10" />
+                android:textColor="?attr/colorPrimary"
+                tools:text="4/5" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -89,9 +93,9 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="20dp">
 
-                <!-- ✅ Nút Thống kê -->
                 <Button
                     android:id="@+id/buttonStatistics"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -99,6 +103,7 @@
 
                 <Button
                     android:id="@+id/buttonFinishQuiz"
+                    style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Hoàn thành"
