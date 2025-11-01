@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 1. Thay đổi root layout thành RelativeLayout -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,169 +8,198 @@
     android:background="#F0F4F8"
     tools:context=".ResultActivity">
 
-    <LinearLayout
+    <!-- 2. Thêm AppBarLayout và Toolbar ở trên cùng -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayoutResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_alignParentTop="true">
 
-        <!-- Image Labels Section -->
-        <TextView
-            android:id="@+id/imageLabelsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Phân loại văn bản"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
-        <androidx.cardview.widget.CardView
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarResult"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="Kết quả Phân tích"
+            app:titleTextColor="@android:color/white" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="100dp">
+    </com.google.android.material.appbar.AppBarLayout>
 
-                <ProgressBar
-                    android:id="@+id/progressBarImageLabels"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
+    <!-- 3. Đặt ScrollView nằm bên dưới Toolbar -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/appBarLayoutResult">
 
-                <TextView
-                    android:id="@+id/imageLabelsTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:textSize="16sp"
-                    android:visibility="gone"
-                    tools:text="Document (95%)\nText (90%)\nPaper (85%)"
-                    tools:visibility="visible" />
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Extracted Text Section -->
-        <TextView
-            android:id="@+id/extractedTextTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/result_extracted_text_title"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"/>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="120dp">
-
-                <ProgressBar
-                    android:id="@+id/progressBarExtractedText"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
-
-                <TextView
-                    android:id="@+id/extractedTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:textSize="16sp"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Summary Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
+            <!-- Nội dung còn lại của bạn giữ nguyên -->
+
+            <!-- Image Labels Section -->
             <TextView
-                android:id="@+id/summaryTitle"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/result_summary_title"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/buttonTranslate"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/imageLabelsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/result_translate"
+                android:text="Nhận diện hình ảnh"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="100dp"
+                    android:padding="16dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressBarImageLabels"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
+
+                    <TextView
+                        android:id="@+id/imageLabelsTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        tools:text="Document (95%)\nText (90%)\nPaper (85%)"
+                        tools:visibility="visible" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Extracted Text Section -->
+            <TextView
+                android:id="@+id/extractedTextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/result_extracted_text_title"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="120dp"
+                    android:padding="16dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressBarExtractedText"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
+
+                    <TextView
+                        android:id="@+id/extractedTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Summary Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/summaryTitle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/result_summary_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/buttonTranslate"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/result_translate"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="120dp"
+                    android:padding="16dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressBarSummary"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
+
+                    <TextView
+                        android:id="@+id/summaryTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        tools:text="Đây là bản tóm tắt mẫu."
+                        tools:visibility="visible" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/buttonTakeQuiz"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/result_take_quiz"
+                android:layout_marginTop="24dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
                 android:visibility="gone"
                 tools:visibility="visible"/>
 
         </LinearLayout>
+    </ScrollView>
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="120dp">
-
-                <ProgressBar
-                    android:id="@+id/progressBarSummary"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
-
-                <TextView
-                    android:id="@+id/summaryTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:textSize="16sp"
-                    android:visibility="gone"
-                    tools:text="Đây là bản tóm tắt mẫu."
-                    tools:visibility="visible" />
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <Button
-            android:id="@+id/buttonTakeQuiz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/result_take_quiz"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-
-    </LinearLayout>
-</ScrollView>
+</RelativeLayout>

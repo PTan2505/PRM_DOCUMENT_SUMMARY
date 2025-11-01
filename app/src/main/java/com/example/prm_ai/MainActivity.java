@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private Button extractButton;
+    private View placeholderContainer;
     private String currentPhotoPath;
     private int userId;
 
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         extractButton = findViewById(R.id.extractButton);
         Button captureButton = findViewById(R.id.captureButton);
         Button selectFromGalleryButton = findViewById(R.id.selectFromGalleryButton); // ✅
+        placeholderContainer = findViewById(R.id.placeholderContainer);
 
         captureButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -89,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
                 imageView.setImageBitmap(imageBitmap);
+                imageView.setVisibility(View.VISIBLE);
+                placeholderContainer.setVisibility(View.GONE);
                 extractButton.setVisibility(View.VISIBLE);
             } else if (requestCode == REQUEST_GALLERY_PICK) {
                 // ✅ Xử lý ảnh từ thư viện
@@ -107,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                         Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
                         imageView.setImageBitmap(imageBitmap);
+                        imageView.setVisibility(View.VISIBLE);
+                        placeholderContainer.setVisibility(View.GONE);
                         extractButton.setVisibility(View.VISIBLE);
                     } catch (IOException e) {
                         Toast.makeText(this, "Failed to load image from gallery", Toast.LENGTH_SHORT).show();

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.prm_ai.network.ApiClient;
 import com.example.prm_ai.network.GeminiApiRequest;
@@ -58,6 +59,13 @@ public class ResultActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
+        Toolbar toolbar = findViewById(R.id.toolbarResult);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Hiển thị nút back
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         extractedTextView = findViewById(R.id.extractedTextView);
         summaryTextView = findViewById(R.id.summaryTextView);
         imageLabelsTextView = findViewById(R.id.imageLabelsTextView);
@@ -96,6 +104,12 @@ public class ResultActivity extends BaseActivity {
 
         buttonTranslate.setOnClickListener(v -> toggleSummaryTranslation());
         buttonTranslate.setVisibility(View.GONE);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed(); // Hàm này sẽ mô phỏng nút back của điện thoại
+        return true;
     }
 
     private void labelImage(Bitmap bitmap) {
