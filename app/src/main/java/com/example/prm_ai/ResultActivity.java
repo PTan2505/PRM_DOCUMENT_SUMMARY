@@ -183,7 +183,6 @@ public class ResultActivity extends BaseActivity {
                     summaryTextView.setText(originalSummaryCache);
                     progressBarSummary.setVisibility(View.GONE);
                     summaryTextView.setVisibility(View.VISIBLE);
-                    buttonTakeQuiz.setVisibility(View.VISIBLE);
 
                     if (!detectedLanguageCode.equals("vi")) {
                         buttonTranslate.setVisibility(View.VISIBLE);
@@ -191,6 +190,7 @@ public class ResultActivity extends BaseActivity {
                         buttonTranslate.setEnabled(false);
                         translateSummaryAndSave(originalText, detectedLanguageCode);
                     } else {
+                        buttonTakeQuiz.setVisibility(View.VISIBLE);
                         saveHistory(originalText, originalSummaryCache, null, detectedLanguageCode);
                     }
                 } else {
@@ -217,12 +217,14 @@ public class ResultActivity extends BaseActivity {
                 } else {
                     buttonTranslate.setVisibility(View.GONE);
                 }
+                buttonTakeQuiz.setVisibility(View.VISIBLE);
                 saveHistory(originalText, originalSummaryCache, translatedSummaryCache, detectedLanguageCode);
             }
 
             @Override
             public void onFailure(@NonNull Call<GeminiApiResponse> call, @NonNull Throwable t) {
                 buttonTranslate.setVisibility(View.GONE);
+                buttonTakeQuiz.setVisibility(View.VISIBLE);
                 saveHistory(originalText, originalSummaryCache, null, detectedLanguageCode);
             }
         });
