@@ -9,6 +9,20 @@
     <string name="result_view_original">Ngôn ngữ gốc</string>
     <string name="result_translating">Đang dịch...</string>
 
+    <!-- Content Descriptions -->
+    <string name="image_labels_icon">Biểu tượng phân loại</string>
+    <string name="extracted_text_icon">Biểu tượng văn bản</string>
+    <string name="summary_icon">Biểu tượng tóm tắt</string>
+
+    <!-- Titles -->
+    <string name="result_image_labels_title">Phân loại văn bản</string>
+
+    <!-- Error Messages -->
+    <string name="error_no_labels_detected">Không phát hiện được nhãn</string>
+    <string name="error_image_labeling_failed">Phân loại hình ảnh thất bại: %s</string>
+    <string name="error_text_recognition_failed">Nhận dạng văn bản thất bại: %s</string>
+    <string name="error_no_text_to_summarize">Không có văn bản để tóm tắt.</string>
+
     <!-- History -->
     <string name="history_title">Lịch sử</string>
     <string name="history_detail_summary_title">Tóm tắt ngôn ngữ gốc</string>

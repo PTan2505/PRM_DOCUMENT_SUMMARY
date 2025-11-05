@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private Button extractButton;
+    private View imageViewPlaceholder;
     private String currentPhotoPath;
     private int userId;
     private GmsDocumentScanner documentScanner;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.imageView);
         extractButton = findViewById(R.id.extractButton);
+        imageViewPlaceholder = findViewById(R.id.imageViewPlaceholder);
         Button captureButton = findViewById(R.id.captureButton);
         Button selectFromGalleryButton = findViewById(R.id.selectFromGalleryButton);
 
@@ -125,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
                             }
                             Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
                             imageView.setImageBitmap(imageBitmap);
-                            extractButton.setVisibility(View.VISIBLE);
+                            imageViewPlaceholder.setVisibility(View.GONE);
+                            findViewById(R.id.extractButtonCard).setVisibility(View.VISIBLE);
                         } catch (IOException e) {
                             Toast.makeText(this, "Failed to process scanned image", Toast.LENGTH_SHORT).show();
                         }
@@ -147,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                         Bitmap imageBitmap = BitmapFactory.decodeFile(currentPhotoPath);
                         imageView.setImageBitmap(imageBitmap);
-                        extractButton.setVisibility(View.VISIBLE);
+                        imageViewPlaceholder.setVisibility(View.GONE);
+                        findViewById(R.id.extractButtonCard).setVisibility(View.VISIBLE);
                     } catch (IOException e) {
                         Toast.makeText(this, "Failed to load image from gallery", Toast.LENGTH_SHORT).show();
                     }

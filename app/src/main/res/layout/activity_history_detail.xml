@@ -15,15 +15,18 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp">
+        android:elevation="0dp"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarHistoryDetail"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#CC1414"
+            android:background="@android:color/white"
             app:title="Chi tiết Lịch sử"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="#CC1414"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="#CC1414" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -36,14 +39,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:background="#FAFAFA">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="#F5F5F5">
+                app:cardBackgroundColor="@android:color/white"
+                app:strokeWidth="0dp">
                 <ImageView
                     android:id="@+id/imageViewDetail"
                     android:layout_width="match_parent"
@@ -56,11 +61,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="#F5F5F5"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp">
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -76,7 +80,7 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
 
-                        android:textColor="@android:color/black" />
+                        android:textColor="#1A1A1A" />
 
                     <TextView
                         android:id="@+id/textViewSummaryDetail"
@@ -85,7 +89,7 @@
                         android:layout_marginTop="8dp"
                         android:textSize="16sp"
 
-                        android:textColor="@android:color/black"
+                        android:textColor="#424242"
 
                         tools:text="This is a summary of the scanned document." />
                 </LinearLayout>
@@ -96,11 +100,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardBackgroundColor="#F5F5F5"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp"
                 android:visibility="visible"
                 tools:visibility="visible">
 
@@ -119,7 +122,7 @@
                         android:textStyle="bold"
                         android:visibility="visible"
 
-                        android:textColor="@android:color/black" />
+                        android:textColor="#1A1A1A" />
 
                     <TextView
                         android:id="@+id/textViewTranslatedSummaryDetail"
@@ -129,7 +132,7 @@
                         android:textSize="16sp"
                         android:visibility="visible"
 
-                        android:textColor="@android:color/black"
+                        android:textColor="#424242"
 
                         tools:text="This is the translated summary." />
                 </LinearLayout>
@@ -139,69 +142,71 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp"
-                app:cardBackgroundColor="#F5F5F5">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@android:color/white">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/quizScoreLabel"
-                        android:layout_width="wrap_content"
+                    <!-- Score Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/history_detail_last_score"
-                        android:textSize="18sp"
-                        android:textColor="@android:color/black"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:id="@+id/textViewScoreDetail"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/quizScoreLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/history_detail_last_score"
+                            android:textSize="18sp"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textViewScoreDetail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#CC1414"
+                            tools:text="8/10" />
+                    </LinearLayout>
+
+                    <!-- Buttons Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/black"
-                        app:layout_constraintBottom_toBottomOf="@id/quizScoreLabel"
-                        app:layout_constraintStart_toEndOf="@+id/quizScoreLabel"
-                        app:layout_constraintTop_toTopOf="@id/quizScoreLabel"
-                        tools:text="8/10" />
+                        android:orientation="horizontal"
+                        android:gravity="end">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonStartQuizDetail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/history_detail_retake"
-                        android:backgroundTint="#CC1414"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonReviewQuiz"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/history_detail_review"
+                            android:textColor="#CC1414" />
 
-                        android:textColor="@android:color/white"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonStartQuizDetail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/history_detail_retake"
+                            android:backgroundTint="#CC1414"
+                            android:textColor="@android:color/white" />
+                    </LinearLayout>
 
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonReviewQuiz"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/history_detail_review"
-
-                        android:textColor="@android:color/black"
-
-                        app:layout_constraintBottom_toBottomOf="@id/buttonStartQuizDetail"
-                        app:layout_constraintEnd_toStartOf="@id/buttonStartQuizDetail"
-                        app:layout_constraintTop_toTopOf="@id/buttonStartQuizDetail" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>

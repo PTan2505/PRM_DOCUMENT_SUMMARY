@@ -5,24 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F7FA"
-
+    android:fitsSystemWindows="true"
     tools:context=".StatisticsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:fitsSystemWindows="true">
+        android:elevation="0dp"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarStatistics"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#CC1414"
+            android:background="@android:color/white"
             app:title="Chi tiết Quiz"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="#CC1414"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="#CC1414" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -30,6 +31,7 @@
         android:id="@+id/recyclerViewStatistics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#FAFAFA"
         android:padding="8dp"/>
 
 </LinearLayout>

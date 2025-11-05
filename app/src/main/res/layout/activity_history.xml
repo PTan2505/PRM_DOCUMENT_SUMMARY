@@ -14,22 +14,25 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp">
+        android:elevation="0dp"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarHistory"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#CC1414"
+            android:background="@android:color/white"
             app:title="Lịch sử Quét"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="#CC1414"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="#CC1414" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F0F4F8">
+        android:background="#FAFAFA">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewHistory"
@@ -49,7 +52,7 @@
             android:drawablePadding="16dp"
             android:gravity="center_horizontal"
             android:text="No scan history found."
-            android:textColor="#888888"
+            android:textColor="#9E9E9E"
             android:textSize="18sp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
